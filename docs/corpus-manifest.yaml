@@ -1,0 +1,119 @@
+# Boswell default corpus roadmap (Project Gutenberg)
+# Verify each ebook on https://www.gutenberg.org/ebooks/<id> before relying on IDs long-term.
+
+schema_version: 1
+
+# Named anchor works (product / literary-historical priorities). All appear in tier_b_download below.
+# Boswell app namesake: James Boswell’s biography of Johnson; Byron: Childe Harold; core drama: Hamlet,
+# Marlowe’s Faust; Dickens: A Tale of Two Cities; English sacred register: KJV Bible + Book of Common Prayer.
+canonical_anchor_works:
+  # Keys use anchor_pg_id so scripts/download_gutenberg.py (tier_b only) does not double-count these lines.
+  - anchor_pg_id: 1564
+    title: "Boswell's Life of Johnson"
+    author: "James Boswell"
+    note: "Abridged/edited edition (Osgood) on PG; full text also exists as multi-volume ebooks."
+  - anchor_pg_id: 5131
+    title: "Childe Harold's Pilgrimage"
+    author: "George Gordon Byron"
+  - anchor_pg_id: 1524
+    title: "The Tragedy of Hamlet, Prince of Denmark"
+    author: "William Shakespeare"
+  - anchor_pg_id: 779
+    title: "The Tragical History of Doctor Faustus"
+    author: "Christopher Marlowe"
+  - anchor_pg_id: 98
+    title: "A Tale of Two Cities"
+    author: "Charles Dickens"
+  - anchor_pg_id: 10
+    title: "The King James Version of the Bible"
+    author: "Various (Anonymous)"
+    period_hint: "Sacred / early modern English"
+  - anchor_pg_id: 29622
+    title: "The Book of Common Prayer and The Scottish Liturgy"
+    author: "Episcopal Church in Scotland"
+    note: "Anglican liturgical text on PG; not the 1662 Church of England edition alone—verify edition for your use case."
+
+# Tier A — committed in git under docs/gutenberg/ (tiny; for CI and smoke tests)
+tier_a_bundled:
+  - path: gutenberg/shakespeare-sonnet-18.txt
+    note: "Public-domain sample text; not a PG file copy."
+
+# Tier B — breadth-first exemplars: download with scripts/download_gutenberg.py → docs/gutenberg/cache/
+# Includes canonical_anchor_works plus additional era/genre coverage. Larger files are OK locally; do not commit cache/.
+tier_b_download:
+  - gutenberg_id: 16328
+    title: "Beowulf: An Anglo-Saxon Epic Poem"
+    author: "Anonymous (tr. J. Lesslie Hall)"
+    period_hint: "Old English"
+  - gutenberg_id: 1524
+    title: "The Tragedy of Hamlet, Prince of Denmark"
+    author: "William Shakespeare"
+    period_hint: "Early Modern"
+  - gutenberg_id: 779
+    title: "The Tragical History of Doctor Faustus"
+    author: "Christopher Marlowe"
+    period_hint: "Early Modern"
+  - gutenberg_id: 151
+    title: "The Rime of the Ancient Mariner"
+    author: "Samuel Taylor Coleridge"
+    period_hint: "Late Modern (Romantic)"
+  - gutenberg_id: 9622
+    title: "Lyrical Ballads, with a Few Other Poems (1798)"
+    author: "William Wordsworth and Samuel Taylor Coleridge"
+    period_hint: "Late Modern (Romantic)"
+  - gutenberg_id: 1564
+    title: "Boswell's Life of Johnson"
+    author: "James Boswell"
+    period_hint: "Late Modern (biography / Johnson circle)"
+    note: "Abridged Osgood edition on PG."
+  - gutenberg_id: 5131
+    title: "Childe Harold's Pilgrimage"
+    author: "George Gordon Byron"
+    period_hint: "Late Modern (Romantic)"
+  - gutenberg_id: 610
+    title: "Idylls of the King"
+    author: "Alfred Tennyson"
+    period_hint: "Victorian"
+  - gutenberg_id: 1661
+    title: "The Adventures of Sherlock Holmes"
+    author: "Arthur Conan Doyle"
+    period_hint: "Victorian / Edwardian"
+    note: "Short-story collection; paired with The Sign of the Four for a novel-length Holmes work."
+  - gutenberg_id: 2097
+    title: "The Sign of the Four"
+    author: "Arthur Conan Doyle"
+    period_hint: "Victorian / Edwardian"
+    note: "Novel; complements the short stories in The Adventures of Sherlock Holmes (1661)."
+  - gutenberg_id: 98
+    title: "A Tale of Two Cities"
+    author: "Charles Dickens"
+    period_hint: "Victorian"
+  - gutenberg_id: 730
+    title: "Oliver Twist"
+    author: "Charles Dickens"
+    period_hint: "Victorian"
+    note: "Second Dickens anchor alongside A Tale of Two Cities (98)."
+  - gutenberg_id: 10
+    title: "The King James Version of the Bible"
+    author: "Various (Anonymous)"
+    period_hint: "Sacred / early modern English"
+  - gutenberg_id: 29622
+    title: "The Book of Common Prayer and The Scottish Liturgy"
+    author: "Episcopal Church in Scotland"
+    period_hint: "Sacred / liturgical English"
+    note: "Scottish Episcopal edition on PG; includes BCP-related material—see canonical_anchor_works note."
+
+# Tier C — bulk / “complete works” goals: do not commit; ingest from disk or object storage
+tier_c_bulk_ingest:
+  description: >
+    Target corpus for production-scale indexing: complete Shakespeare, complete Marlowe,
+    broad Byron/Coleridge/Wordsworth/Tennyson, complete Sherlock Holmes canon, complete Dickens,
+    extended biblical and liturgical corpora (other KJV editions, 1662 BCP if available, parallel translations), etc.
+  approach:
+    - Use Project Gutenberg author listings and ebook tables to build a machine-readable ID list.
+    - Download to a local or MinIO-backed prefix; run the same chunk/embed pipeline as Tier B.
+    - Prefer one editorial line per author where possible to avoid duplicate chunks from competing editions.
+  references:
+    - "https://www.gutenberg.org/ebooks/author/65"   # Shakespeare (example author page)
+    - "https://www.gutenberg.org/ebooks/author/37"   # Dickens
+    - "https://www.gutenberg.org/ebooks/author/69"   # Arthur Conan Doyle

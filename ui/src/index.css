@@ -1,0 +1,69 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Scottish-flag-inspired: blue + white, limited red accent (PRD §14) */
+@layer base {
+  :root {
+    --background: 210 25% 98%;
+    --foreground: 215 35% 16%;
+    --card: 0 0% 100%;
+    --card-foreground: 215 35% 16%;
+    --card-border: 210 20% 90%;
+    --primary: 207 100% 37%;
+    --primary-foreground: 0 0% 100%;
+    --secondary: 210 40% 96%;
+    --secondary-foreground: 215 35% 16%;
+    --muted: 210 25% 94%;
+    --muted-foreground: 215 16% 45%;
+    --accent: 354 72% 45%;
+    --accent-foreground: 0 0% 100%;
+    --destructive: 0 72% 50%;
+    --destructive-foreground: 0 0% 100%;
+    --border: 210 20% 88%;
+    --input: 210 20% 88%;
+    --ring: 207 100% 37%;
+    --radius: 0.5rem;
+    --sidebar: 210 45% 97%;
+    --sidebar-foreground: 215 30% 22%;
+    --tray: 0 0% 100%;
+  }
+
+  .dark {
+    --background: 215 32% 9%;
+    --foreground: 210 30% 96%;
+    --card: 215 28% 12%;
+    --card-foreground: 210 30% 96%;
+    --card-border: 215 25% 18%;
+    --primary: 207 90% 48%;
+    --primary-foreground: 215 35% 8%;
+    --secondary: 215 28% 16%;
+    --secondary-foreground: 210 30% 96%;
+    --muted: 215 25% 18%;
+    --muted-foreground: 215 16% 65%;
+    --accent: 354 72% 52%;
+    --accent-foreground: 0 0% 100%;
+    --destructive: 0 62% 45%;
+    --destructive-foreground: 0 0% 100%;
+    --border: 215 25% 20%;
+    --input: 215 25% 20%;
+    --ring: 207 90% 48%;
+    --sidebar: 215 32% 11%;
+    --sidebar-foreground: 210 25% 92%;
+    --tray: 215 28% 12%;
+  }
+
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply bg-background text-foreground antialiased;
+  }
+}
+
+@layer utilities {
+  .text-balance {
+    text-wrap: balance;
+  }
+}

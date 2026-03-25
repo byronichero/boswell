@@ -1,0 +1,100 @@
+# Boswell stack: Postgres, Neo4j, Qdrant, FastAPI backend, Vite UI.
+# Ollama and MinIO run on the host only (see .env.example).
+# Usage: docker compose up --build
+
+services:
+  backend:
+    build:
+      context: .
+      dockerfile: backend/Dockerfile
+    restart: unless-stopped
+    environment:
+      DATABASE_URL: postgresql+psycopg2://boswell:boswell@db:5432/boswell
+      NEO4J_URI: neo4j://neo4j:7687
+      NEO4J_USER: neo4j
+      NEO4J_PASSWORD: password
+      QDRANT_URL: http://qdrant:6333
+      QDRANT_COLLECTION: boswell_chunks
+      OLLAMA_HOST: http://host.docker.internal:11434
+      OLLAMA_EMBED_MODEL: nomic-embed-text
+      OLLAMA_CHAT_MODEL: llama3.2
+      OLLAMA_TIMEOUT_S: "300"
+      EMBEDDING_DIMENSION: "768"
+      CHUNK_SIZE: "1200"
+      CHUNK_OVERLAP: "150"
+      MAX_TRAY_ITEMS: "40"
+      MAX_TRAY_EXCERPT_CHARS: "120000"
+      SOFT_SCOPE_NEIGHBOR_PERIODS: "1"
+      CORS_ORIGINS: http://localhost:5173,http://127.0.0.1:5173
+    ports:
+      - "8000:8000"
+    depends_on:
+      db:
+        condition: service_healthy
+      neo4j:
+        condition: service_started
+      qdrant:
+        condition: service_started
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    volumes:
+      - ./scripts:/app/scripts:ro
+      - ./docs:/app/docs:ro
+
+  ui:
+    image: node:20-alpine
+    working_dir: /app
+    restart: unless-stopped
+    volumes:
+      - ./ui:/app
+      - ui_node_modules:/app/node_modules
+    command: sh -c "npm install && npm run dev -- --host 0.0.0.0 --port 5173"
+    ports:
+      - "5173:5173"
+    depends_on:
+      - backend
+    environment:
+      VITE_API_BASE: ""
+
+  db:
+    image: postgres:15-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: boswell
+      POSTGRES_PASSWORD: boswell
+      POSTGRES_DB: boswell
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    # Host 5432 is often taken by a local Postgres; map to 5435 on the host only.
+    ports:
+      - "5435:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U boswell -d boswell"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  neo4j:
+    image: neo4j:5.9
+    restart: unless-stopped
+    environment:
+      NEO4J_AUTH: neo4j/password
+    ports:
+      - "7474:7474"
+      - "7687:7687"
+    volumes:
+      - neo4j_data:/data
+
+  qdrant:
+    image: qdrant/qdrant:latest
+    restart: unless-stopped
+    volumes:
+      - qdrant_data:/qdrant/storage
+    ports:
+      - "6333:6333"
+
+volumes:
+  pgdata:
+  qdrant_data:
+  neo4j_data:
+  ui_node_modules:
