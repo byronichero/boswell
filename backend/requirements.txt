@@ -7,6 +7,8 @@ pydantic-settings==2.6.1
 httpx==0.28.1
 neo4j==5.27.0
 qdrant-client==1.12.1
+minio==7.2.15
+docling==2.82.0
 python-multipart==0.0.20
 ruff==0.8.3
 pytest==8.3.4

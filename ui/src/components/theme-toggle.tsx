@@ -1,21 +1,27 @@
-import { Moon, Sun } from "lucide-react";
-import { useEffect, useState } from "react";
+import { Monitor, Moon, Sun } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
+import { useTheme } from "@/contexts/theme";
 import { cn } from "@/lib/utils";
 
-export function ThemeToggle({ className }: { className?: string }) {
-  const [dark, setDark] = useState(false);
+export function ThemeToggle({ className }: Readonly<{ className?: string }>) {
+  const { theme, setTheme } = useTheme();
 
-  useEffect(() => {
-    setDark(document.documentElement.classList.contains("dark"));
-  }, []);
-
-  function toggle() {
-    const next = !document.documentElement.classList.contains("dark");
-    document.documentElement.classList.toggle("dark", next);
-    setDark(next);
+  function cycleTheme(): void {
+    if (theme === "light") {
+      setTheme("dark");
+      return;
+    }
+    if (theme === "dark") {
+      setTheme("system");
+      return;
+    }
+    setTheme("light");
   }
+
+  let icon: React.ReactNode = <Monitor className="h-4 w-4" />;
+  if (theme === "light") icon = <Sun className="h-4 w-4" />;
+  if (theme === "dark") icon = <Moon className="h-4 w-4" />;
 
   return (
     <Button
@@ -23,10 +29,12 @@ export function ThemeToggle({ className }: { className?: string }) {
       variant="outline"
       size="icon"
       className={cn(className)}
-      onClick={toggle}
+      onClick={cycleTheme}
       aria-label="Toggle theme"
+      title={`Theme: ${theme}`}
     >
-      {dark ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
+      {icon}
     </Button>
   );
 }
+

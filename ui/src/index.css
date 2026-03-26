@@ -60,6 +60,11 @@
   body {
     @apply bg-background text-foreground antialiased;
   }
+  /* Visible focus rings for keyboard users */
+  a:focus-visible,
+  button:focus-visible {
+    @apply outline-none ring-2 ring-ring ring-offset-2 ring-offset-background;
+  }
 }
 
 @layer utilities {

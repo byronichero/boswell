@@ -10,3 +10,6 @@ __pycache__/
 .ruff_cache/
 *.tsbuildinfo
 .venv/
+
+# Local planning / scratch (not committed)
+todo.md

@@ -39,6 +39,11 @@ class Settings(BaseSettings):
     max_tray_excerpt_chars: int = 120_000
 
     cors_origins: str = "http://localhost:5173,http://127.0.0.1:5173"
+    auto_seed_on_startup: bool = True
+    auto_seed_index_sample: bool = True
+    auto_seed_sync_neo4j: bool = True
+    auto_seed_manifest_tier_b: bool = True
+    auto_seed_manifest_download_timeout_s: int = 60
 
 
 @lru_cache
