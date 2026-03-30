@@ -1,6 +1,7 @@
 import {
   Activity,
   BarChart3,
+  GraduationCap,
   HelpCircle,
   Home,
   Inbox,
@@ -91,6 +92,7 @@ export default function Layout() {
           <NavItem to="/knowledge-base" label="Knowledge Base" icon={<Inbox className="h-4 w-4" />} />
           <NavItem to="/graph-lab" label="Graph Lab" icon={<Network className="h-4 w-4" />} />
           <div className="my-2 border-t border-border/60" />
+          <NavItem to="/tutorial" label="Getting started" icon={<GraduationCap className="h-4 w-4" />} />
           <NavItem to="/status" label="Status" icon={<Activity className="h-4 w-4" />} />
           <NavItem to="/faq" label="FAQ" icon={<HelpCircle className="h-4 w-4" />} />
           <NavItem to="/help" label="Help" icon={<HelpCircle className="h-4 w-4" />} />

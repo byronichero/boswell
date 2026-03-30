@@ -17,7 +17,7 @@ docker compose up --build
 ```
 
 - **API**: [http://localhost:8000](http://localhost:8000) — OpenAPI at `/docs`
-- **UI**: [http://localhost:5173](http://localhost:5173) — Vite dev server proxies `/api` and `/health` to the backend
+- **UI**: [http://localhost:5173](http://localhost:5173) — Vite dev server proxies `/api` and `/health` to the backend. **Getting started** (`/tutorial`) walks through corpus scope, Evidence tray, and demo seed commands; **Help** (`/help`) links into it.
 - **Memgraph Lab** (`memgraph-lab` service): graph explorer; Quick Connect uses the `memgraph` Bolt service. With Compose, Lab is at `http://localhost:3000/memgraph-lab/` on the host (port 3000 published). The **Graph Lab** page (`/graph-lab`) embeds Lab via the same origin as the UI (`/memgraph-lab/` proxied by Vite to `memgraph-lab`), which avoids cross-origin iframe restrictions.
 - **Postgres (host access)**: mapped to **localhost:5435** so it does not clash with a local server on 5432. Containers still use `db:5432` internally.
 

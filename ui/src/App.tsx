@@ -10,6 +10,7 @@ import ChatPage from "@/pages/chat";
 import FaqPage from "@/pages/faq";
 import GraphLabPage from "@/pages/graph-lab";
 import HelpPage from "@/pages/help";
+import TutorialPage from "@/pages/tutorial";
 import KnowledgeBasePage from "@/pages/knowledge-base";
 import KeywordsPage from "@/pages/keywords";
 import SemanticPage from "@/pages/semantic";
@@ -49,6 +50,7 @@ export function App() {
         <Route path="graph-lab" element={<GraphLabPage />} />
         <Route path="status" element={<StatusPage />} />
         <Route path="faq" element={<FaqPage />} />
+        <Route path="tutorial" element={<TutorialPage />} />
         <Route path="help" element={<HelpPage />} />
       </Route>
     </Routes>

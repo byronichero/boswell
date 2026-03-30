@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from "react";
+import { Link } from "react-router-dom";
 
 import { OllamaModelSelect } from "@/components/ollama-model-select";
 import { Button } from "@/components/ui/button";
@@ -53,7 +54,12 @@ export default function HomePage() {
               <CardTitle className="font-serif text-2xl">Home</CardTitle>
               <CardDescription>
                 Open conversation with Boswell. This is general chat (not tied to your Evidence tray). For
-                analysis grounded in specific excerpts, use <strong>Evidence chat</strong> in the sidebar.
+                analysis grounded in specific excerpts, use <strong>Evidence chat</strong> in the sidebar. New to the
+                stack? See{" "}
+                <Link to="/tutorial" className="font-medium text-primary underline underline-offset-4">
+                  Getting started
+                </Link>{" "}
+                (corpus, scope, tray, demo seed).
               </CardDescription>
             </div>
             <OllamaModelSelect className="sm:justify-end" id="home-ollama-model" disabled={isSending} />
