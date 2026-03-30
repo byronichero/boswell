@@ -24,6 +24,11 @@ def _tokenize(text: str) -> list[str]:
     return re.findall(r"[A-Za-z']+", text.lower())
 
 
+def word_token_count(content: str) -> int:
+    """Number of word tokens (same rules as stylistics / keywords)."""
+    return len(_tokenize(content))
+
+
 def concordance_hits(
     db: Session,
     *,
@@ -149,3 +154,89 @@ def stylistics_lite(content: str) -> dict[str, float | int]:
         "question_per_1k_words": per_1k(question_mark_count),
         "exclamation_per_1k_words": per_1k(exclamation_mark_count),
     }
+
+
+def rolling_word_windows(
+    content: str,
+    *,
+    window_words: int = 500,
+    stride_words: int = 250,
+    max_windows: int = 400,
+) -> tuple[list[dict[str, float | int]], bool]:
+    """Sliding word-token windows: local TTR and avg word length (prose-oriented).
+
+    Same token rules as ``stylistics_lite``. If total tokens are below ``window_words``,
+    a single window covers the whole text. Otherwise only full-width windows are emitted
+    (no trailing partial window).
+    """
+    tokens = _tokenize(content)
+    n = len(tokens)
+    if n == 0:
+        return [], False
+    window_words = max(50, min(window_words, 50_000))
+    stride_words = max(1, min(stride_words, window_words))
+    out: list[dict[str, float | int]] = []
+    truncated = False
+
+    def append_window(i: int, chunk: list[str], wi: int) -> None:
+        types = len(set(chunk))
+        ttr = types / len(chunk)
+        avg_wl = sum(len(w) for w in chunk) / len(chunk)
+        out.append(
+            {
+                "window_index": wi,
+                "start_token_index": i,
+                "end_token_index": i + len(chunk) - 1,
+                "word_count": len(chunk),
+                "type_token_ratio": round(ttr, 4),
+                "avg_word_length": round(avg_wl, 2),
+            }
+        )
+
+    if n < window_words:
+        append_window(0, tokens, 0)
+        return out, False
+
+    i = 0
+    wi = 0
+    while i + window_words <= n:
+        chunk = tokens[i : i + window_words]
+        append_window(i, chunk, wi)
+        wi += 1
+        i += stride_words
+        if len(out) >= max_windows:
+            truncated = True
+            break
+    return out, truncated
+
+
+def rolling_sentence_word_lengths(
+    content: str,
+    *,
+    smooth: int = 5,
+) -> list[dict[str, float | int]]:
+    """Per sentence: word count and centered moving average (sentence-length pacing)."""
+    stripped = content.strip()
+    sentences = re.split(r"(?<=[.!?])\s+", stripped)
+    sentences = [s for s in sentences if s.strip()]
+    lengths = [len(_tokenize(s)) for s in sentences]
+    if not lengths:
+        return []
+    smooth = max(1, min(smooth, 101))
+    half = smooth // 2
+    out: list[dict[str, float | int]] = []
+    for i in range(len(lengths)):
+        lo = max(0, i - half)
+        hi = min(len(lengths), lo + smooth)
+        if hi - lo < smooth:
+            lo = max(0, hi - smooth)
+        window = lengths[lo:hi]
+        avg = sum(window) / len(window)
+        out.append(
+            {
+                "sentence_index": i,
+                "words_in_sentence": lengths[i],
+                "rolling_avg_words": round(avg, 2),
+            }
+        )
+    return out

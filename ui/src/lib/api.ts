@@ -12,7 +12,9 @@ import type {
   ScopeInfo,
   SemanticSearchRequest,
   SemanticSearchResponse,
+  StylisticsCompareResponse,
   StylisticsLiteResponse,
+  StylisticsRollingResponse,
   SynthesizeRequest,
   SynthesizeResponse,
   TrayItemCreate,
@@ -68,6 +70,31 @@ export const api = {
   },
   /** Matches `GET /api/works/{work_id}/stylistics-lite` in `backend/app/routers/works.py`. */
   getStylistics: (workId: number) => fetchAPI<StylisticsLiteResponse>(`/api/works/${workId}/stylistics-lite`),
+
+  getStylisticsCompare: (workIdA: number, workIdB: number) =>
+    fetchAPI<StylisticsCompareResponse>(
+      `/api/works/stylistics/compare?work_id_a=${workIdA}&work_id_b=${workIdB}`,
+    ),
+
+  getStylisticsRolling: (
+    workId: number,
+    params?: Readonly<{
+      window_words?: number;
+      stride_words?: number;
+      sentence_smooth?: number;
+      max_windows?: number;
+    }>,
+  ) => {
+    const p = new URLSearchParams();
+    if (params?.window_words != null) p.set("window_words", String(params.window_words));
+    if (params?.stride_words != null) p.set("stride_words", String(params.stride_words));
+    if (params?.sentence_smooth != null) p.set("sentence_smooth", String(params.sentence_smooth));
+    if (params?.max_windows != null) p.set("max_windows", String(params.max_windows));
+    const q = p.toString();
+    return fetchAPI<StylisticsRollingResponse>(
+      `/api/works/${workId}/stylistics-rolling${q ? `?${q}` : ""}`,
+    );
+  },
 
   // Search tools
   getConcordance: (query: string, periodId: number | null, soft: boolean, context: number) => {

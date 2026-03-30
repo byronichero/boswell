@@ -96,6 +96,52 @@ export interface StylisticsLiteResponse {
   exclamation_per_1k_words: number;
 }
 
+export interface WorkStylisticsMeta {
+  work_id: number;
+  title: string;
+  author: string;
+  year: number | null;
+  period_name: string | null;
+}
+
+export interface StylisticsCompareResponse {
+  work_a: StylisticsLiteResponse;
+  work_b: StylisticsLiteResponse;
+  meta_a: WorkStylisticsMeta;
+  meta_b: WorkStylisticsMeta;
+}
+
+export interface RollingWordWindowPoint {
+  window_index: number;
+  start_token_index: number;
+  end_token_index: number;
+  word_count: number;
+  type_token_ratio: number;
+  avg_word_length: number;
+}
+
+export interface RollingSentencePoint {
+  sentence_index: number;
+  words_in_sentence: number;
+  rolling_avg_words: number;
+}
+
+export interface StylisticsRollingResponse {
+  work_id: number;
+  title: string;
+  author: string;
+  year: number | null;
+  period_name: string | null;
+  window_words: number;
+  stride_words: number;
+  sentence_smooth: number;
+  word_windows: RollingWordWindowPoint[];
+  sentence_series: RollingSentencePoint[];
+  word_windows_truncated: boolean;
+  total_word_tokens: number;
+  total_sentences: number;
+}
+
 export interface TrayItemCreate {
   work_id: number;
   locator: string;
