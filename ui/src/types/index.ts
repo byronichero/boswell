@@ -231,10 +231,25 @@ export interface KnowledgeBaseDocument {
 
 export interface KnowledgeBaseJob {
   job_id: string;
+  kind?: string;
   filename: string;
   status: "pending" | "running" | "completed" | "failed";
   chunks?: number | null;
   work_id?: number | null;
   error?: string | null;
+}
+
+export interface KnowledgeBaseSearchHit {
+  score: number;
+  work_id: number;
+  work_title: string;
+  chunk_index: number;
+  text: string;
+  locator: string;
+}
+
+export interface KnowledgeBaseSearchResponse {
+  query: string;
+  hits: KnowledgeBaseSearchHit[];
 }
 

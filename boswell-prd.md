@@ -215,7 +215,7 @@ boswell/
 │   ├── init_data.py             # Load Gutenberg texts + periods
 │   └── download_gutenberg.py    # Tier B downloads per docs/corpus-manifest.yaml
 ├── docs/
-│   ├── README.md            # Starter corpus policy (Richelieu-style)
+│   ├── README.md            # Starter corpus policy
 │   ├── corpus-manifest.yaml # Tier A/B/C roadmap; PG ebook IDs for Tier B
 │   └── gutenberg/           # Optional PD .txt/.md + cache/ (downloads gitignored)
 ├── docker-compose.yml
@@ -228,7 +228,7 @@ boswell/
 
 ### Starter corpus (`docs/`) <a name="starter-corpus"></a>
 
-Ship a **small, documented** set of public-domain texts under `docs/` (e.g. `docs/gutenberg/*.txt`), mirroring **Richelieu** / **Tocqueville**: starter files for dev and ingest smoke tests, **not** large corpora in git. **`docs/corpus-manifest.yaml`** defines **Tier A** (bundled samples), **Tier B** (breadth-first Gutenberg IDs fetched via `scripts/download_gutenberg.py` into gitignored `docs/gutenberg/cache/`), and **Tier C** (bulk ingest goals). See [`docs/README.md`](docs/README.md) for Gutenberg conventions, license notes, and the distinction between `docs/` (curated seed) and **MinIO** (runtime uploads/exports). A minimal sample text is included for concordance/keyword tests.
+Ship a **small, documented** set of public-domain texts under `docs/` (e.g. `docs/gutenberg/*.txt`): starter files for dev and ingest smoke tests, **not** large corpora in git. **`docs/corpus-manifest.yaml`** defines **Tier A** (bundled samples), **Tier B** (breadth-first Gutenberg IDs fetched via `scripts/download_gutenberg.py` into gitignored `docs/gutenberg/cache/`), and **Tier C** (bulk ingest goals). See [`docs/README.md`](docs/README.md) for Gutenberg conventions, license notes, and the distinction between `docs/` (curated seed) and **MinIO** (runtime uploads/exports). A minimal sample text is included for concordance/keyword tests.
 
 ---
 
@@ -783,11 +783,9 @@ The architecture uses:
 The repository layout and CI pipeline follow best practices, ensuring reproducible builds, unit tests, and optional Docker Hub deployment. Use GitHub actions to trigger automated builds on every push or PR.  
 
 ---
-## 14. Reference Apps <a name="reference-apps"></a>
-- **/home/pradeep/AiProjects/tocqueville** (reskin reference: theme/palette + “analysis-style” UI flows)
-- **/home/pradeep/AiProjects/richelieu** (reskin reference: Docling + Qdrant ingest + Memgraph period scoping + CopilotKit UI)
+## 14. UI theme defaults <a name="reference-apps"></a>
 
-### Scottish Flag Scheme (Boswell Reskin Defaults)
+### Scottish flag scheme
 - Replace the existing portrait/logo asset with a Boswell mark (e.g. `/boswell-portrait.jpg`).
 - Update the Tailwind/CSS palette to a Scottish-flag-inspired accent scheme (blue + white, with a limited red accent).
 - Rename assistant titles, navigation labels, and app descriptions everywhere in layout metadata to “Boswell”.

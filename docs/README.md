@@ -1,6 +1,6 @@
 # Boswell — Starter corpus (`docs/`)
 
-This folder holds **reference and starter documents** for local development and demos, following the same idea as **Richelieu** / **Tocqueville**: ship a small, documented set of files with the repo; scale up via scripts or downloads rather than bloating git.
+This folder holds **reference and starter documents** for local development and demos: ship a small, documented set of files with the repo; scale up via scripts or downloads rather than bloating git.
 
 ## Corpus tiers
 
@@ -28,7 +28,7 @@ Files are written as `docs/gutenberg/cache/pg<N>.txt`. The cache directory is li
 ## Purpose
 
 - **Seed content** for concordance, keywords, stylistics, and Evidence-tray workflows before a full Gutenberg ingest pipeline runs.
-- **Documented ingest surface** when the backend implements folder-based ingest (pattern: `POST .../documents/ingest` or `python -m app.scripts.ingest_docs`), aligned with Richelieu.
+- **Documented ingest surface** when the backend implements folder-based ingest (pattern: `POST .../documents/ingest` or `python -m app.scripts.ingest_docs`).
 
 ## `gutenberg/` — public-domain plain text
 

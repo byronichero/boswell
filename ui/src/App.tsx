@@ -28,8 +28,10 @@ export function App() {
     setEntered(dismissed);
   }, []);
 
-  function handleEnter(): void {
-    globalThis.window?.localStorage.setItem(SPLASH_STORAGE_KEY, "true");
+  function handleEnter(persistDismiss: boolean): void {
+    if (persistDismiss) {
+      globalThis.window?.localStorage.setItem(SPLASH_STORAGE_KEY, "true");
+    }
     setEntered(true);
   }
 

@@ -16,7 +16,7 @@ from app.models.document_job import DocumentJob
 from app.models.work import Work
 from app.services.chunking import chunk_text
 from app.services.memgraph_sync import sync_from_postgres
-from app.services.minio_store import get_object_stream, put_bytes_at_key
+from app.services.minio_store import get_object_stream, object_exists, put_bytes_at_key
 from app.services.ollama_client import embed_texts
 from app.services.qdrant_chunks import upsert_chunks
 
@@ -62,6 +62,51 @@ def _extract_text_with_docling(data: bytes, filename: str) -> str:
 def derived_markdown_key(document_id: uuid.UUID) -> str:
     """Build object key for Docling-derived markdown."""
     return f"documents/derived/{document_id}.md"
+
+
+def _read_object_bytes(object_key: str, settings: Settings) -> bytes:
+    stream = get_object_stream(object_key, settings=settings)
+    try:
+        return stream.read()
+    finally:
+        stream.close()
+        stream.release_conn()
+
+
+def read_preview_text(doc: Document, settings: Settings | None = None) -> str:
+    """UTF-8 text for /preview: plain files or derived markdown after ingest.
+
+    Raises:
+        ValueError: If preview is not available yet (e.g. PDF before ingest).
+    """
+    settings = settings or get_settings()
+    name_lower = doc.name.lower()
+    if name_lower.endswith((".txt", ".md", ".markdown")):
+        return _read_object_bytes(doc.object_key, settings).decode("utf-8", errors="replace")
+    derived = derived_markdown_key(doc.id)
+    if not object_exists(derived, settings=settings):
+        raise ValueError("Preview unavailable until ingest completes for this file type")
+    return _read_object_bytes(derived, settings).decode("utf-8", errors="replace")
+
+
+def read_markdown_for_export(doc: Document, settings: Settings | None = None) -> str:
+    """Markdown/plain text for download-md: derived blob, plain files, or Docling on demand.
+
+    Raises:
+        ValueError: If the file type cannot be exported as markdown.
+        RuntimeError: If Docling fails.
+    """
+    settings = settings or get_settings()
+    derived = derived_markdown_key(doc.id)
+    if object_exists(derived, settings=settings):
+        return _read_object_bytes(derived, settings).decode("utf-8", errors="replace")
+    name_lower = doc.name.lower()
+    if name_lower.endswith((".txt", ".md", ".markdown")):
+        return _read_object_bytes(doc.object_key, settings).decode("utf-8", errors="replace")
+    if name_lower.endswith((".pdf", ".docx", ".pptx", ".xlsx", ".html", ".htm")):
+        data = _read_object_bytes(doc.object_key, settings)
+        return _extract_text_with_docling(data, doc.name)
+    raise ValueError("Unsupported file type for markdown export")
 
 
 def run_ingest_job(job_id: uuid.UUID, *, settings: Settings | None = None) -> None:

@@ -36,7 +36,7 @@ Use `--force` to reset the DB and vector collection (development only). Use `--s
 | Path | Purpose |
 |------|---------|
 | `backend/app/` | FastAPI app (`/api/*`, `/health`) |
-| `ui/` | React + Vite + Tailwind (Richelieu-style layout; Scottish blue / white / red accent) |
+| `ui/` | React + Vite + Tailwind (sidebar layout; Scottish blue / white / red accent) |
 | `scripts/` | `init_data.py`, `download_gutenberg.py` |
 | `docs/` | Starter corpus + `corpus-manifest.yaml` |
 

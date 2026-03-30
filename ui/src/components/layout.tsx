@@ -83,7 +83,7 @@ export default function Layout() {
 
   return (
     <div className="flex min-h-screen bg-background text-foreground">
-      {/* Sidebar — collapsible (Richelieu-style): icon rail when minimized */}
+      {/* Sidebar — collapsible; icon rail when minimized */}
       <aside
         className={cn(
           "hidden min-h-0 flex-col border-r bg-[hsl(var(--sidebar))] transition-all duration-200 md:flex",

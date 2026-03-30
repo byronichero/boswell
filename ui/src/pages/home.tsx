@@ -23,7 +23,7 @@ import { api } from "@/lib/api";
 import type { ChatOpenMessage } from "@/types";
 import { cn } from "@/lib/utils";
 
-/** Matches Richelieu home quick-action rows. */
+/** Shared styling for home quick-action link rows. */
 const quickActionLink =
   "flex items-center gap-2.5 rounded-lg border p-2.5 text-sm transition-colors hover:bg-accent hover:border-primary/30 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2";
 

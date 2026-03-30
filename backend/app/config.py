@@ -30,6 +30,9 @@ class Settings(BaseSettings):
     minio_secure: bool = False
     minio_bucket: str = "boswell"
 
+    # Knowledge Base uploads: max size (413 when exceeded)
+    max_upload_bytes: int = 25 * 1024 * 1024
+
     soft_scope_neighbor_periods: int = 1
     chunk_size: int = 1200
     chunk_overlap: int = 150

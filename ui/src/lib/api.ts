@@ -6,6 +6,7 @@ import type {
   HealthResponse,
   KnowledgeBaseDocument,
   KnowledgeBaseJob,
+  KnowledgeBaseSearchResponse,
   KeywordResponse,
   Period,
   ReadyResponse,
@@ -163,8 +164,29 @@ export const api = {
     const formData = new FormData();
     formData.append("file", file);
     const response = await fetch("/api/documents/upload", { method: "POST", body: formData });
-    if (!response.ok) throw new Error(response.statusText);
-    return (await response.json()) as { job_id: string; filename: string; document_id: string };
+    if (!response.ok) {
+      let message = response.statusText;
+      try {
+        const body = (await response.json()) as { detail?: unknown };
+        if (typeof body?.detail === "string") message = body.detail;
+        else if (body?.detail != null) message = JSON.stringify(body.detail);
+      } catch {
+        // ignore
+      }
+      throw new Error(message);
+    }
+    return (await response.json()) as {
+      job_id: string;
+      filename: string;
+      document_id: string;
+      message?: string;
+    };
+  },
+  searchKnowledgeBase: (query: string, limit?: number) => {
+    const params = new URLSearchParams();
+    params.set("q", query);
+    if (limit != null) params.set("limit", String(limit));
+    return fetchAPI<KnowledgeBaseSearchResponse>(`/api/documents/search?${params.toString()}`);
   },
   ingestDocument: (docId: string) =>
     fetchAPI<{ job_id: string; filename: string; document_id: string }>(`/api/documents/ingest?doc_id=${encodeURIComponent(docId)}`, {
