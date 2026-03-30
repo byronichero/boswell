@@ -74,8 +74,26 @@ export interface StylisticsLiteResponse {
   title: string;
   char_count: number;
   sentence_count: number;
+  /** Mean characters per sentence (simple . ? ! split); prose-oriented. */
   avg_sentence_length: number;
   dialogue_line_markers: number;
+  avg_words_per_sentence: number;
+  word_count: number;
+  unique_word_types: number;
+  type_token_ratio: number;
+  comma_count: number;
+  semicolon_count: number;
+  colon_count: number;
+  question_mark_count: number;
+  exclamation_mark_count: number;
+  dash_em_en_count: number;
+  paren_open_count: number;
+  paren_close_count: number;
+  comma_per_1k_words: number;
+  semicolon_per_1k_words: number;
+  colon_per_1k_words: number;
+  question_per_1k_words: number;
+  exclamation_per_1k_words: number;
 }
 
 export interface TrayItemCreate {

@@ -66,7 +66,8 @@ export const api = {
     params.set("soft", String(soft));
     return fetchAPI<WorkListItem[]>(`/api/works?${params.toString()}`);
   },
-  getStylistics: (workId: number) => fetchAPI<StylisticsLiteResponse>(`/api/works/${workId}/stylistics`),
+  /** Matches `GET /api/works/{work_id}/stylistics-lite` in `backend/app/routers/works.py`. */
+  getStylistics: (workId: number) => fetchAPI<StylisticsLiteResponse>(`/api/works/${workId}/stylistics-lite`),
 
   // Search tools
   getConcordance: (query: string, periodId: number | null, soft: boolean, context: number) => {

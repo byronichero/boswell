@@ -91,16 +91,61 @@ def keyword_frequencies(
 
 
 def stylistics_lite(content: str) -> dict[str, float | int]:
-    """Observational sentence stats and rough dialogue markers."""
-    sentences = re.split(r"(?<=[.!?])\s+", content.strip())
+    """Observational prose-oriented stats: sentences, words, punctuation (heuristic).
+
+    Sentence splitting follows simple punctuation rules; verse, drama, and unpunctuated
+    prose may skew counts. See API docs / UI disclaimer.
+    """
+    stripped = content.strip()
+    sentences = re.split(r"(?<=[.!?])\s+", stripped)
     sentences = [s for s in sentences if s.strip()]
     sc = len(sentences)
     cc = len(content)
-    avg = (cc / sc) if sc else 0.0
+
+    tokens = _tokenize(content)
+    word_count = len(tokens)
+    unique_types = len(set(tokens)) if tokens else 0
+    ttr = (unique_types / word_count) if word_count else 0.0
+
+    avg_chars_per_sentence = (cc / sc) if sc else 0.0
+    words_per_sentence_tokens = [_tokenize(s) for s in sentences]
+    wps_flat = [len(w) for w in words_per_sentence_tokens]
+    avg_words_per_sentence = (sum(wps_flat) / len(wps_flat)) if wps_flat else 0.0
+
     dialogue_markers = content.count('"') + content.count("“") + content.count("”")
+
+    comma_count = content.count(",")
+    semicolon_count = content.count(";")
+    colon_count = content.count(":")
+    question_mark_count = content.count("?")
+    exclamation_mark_count = content.count("!")
+    dash_em_en_count = content.count("—") + content.count("–")
+    paren_open_count = content.count("(")
+    paren_close_count = content.count(")")
+
+    def per_1k(n: int) -> float:
+        return round((n / word_count) * 1000, 2) if word_count else 0.0
+
     return {
         "char_count": cc,
         "sentence_count": sc,
-        "avg_sentence_length": round(avg, 2),
+        "avg_sentence_length": round(avg_chars_per_sentence, 2),
+        "avg_words_per_sentence": round(avg_words_per_sentence, 2),
+        "word_count": word_count,
+        "unique_word_types": unique_types,
+        "type_token_ratio": round(ttr, 4),
         "dialogue_line_markers": dialogue_markers,
+        "comma_count": comma_count,
+        "semicolon_count": semicolon_count,
+        "colon_count": colon_count,
+        "question_mark_count": question_mark_count,
+        "exclamation_mark_count": exclamation_mark_count,
+        "dash_em_en_count": dash_em_en_count,
+        "paren_open_count": paren_open_count,
+        "paren_close_count": paren_close_count,
+        "comma_per_1k_words": per_1k(comma_count),
+        "semicolon_per_1k_words": per_1k(semicolon_count),
+        "colon_per_1k_words": per_1k(colon_count),
+        "question_per_1k_words": per_1k(question_mark_count),
+        "exclamation_per_1k_words": per_1k(exclamation_mark_count),
     }

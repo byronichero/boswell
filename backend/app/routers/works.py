@@ -78,7 +78,7 @@ def get_work(work_id: int, db: Session = Depends(get_db)) -> WorkRead:
 
 @router.get("/{work_id}/stylistics-lite", response_model=StylisticsLiteResponse)
 def work_stylistics(work_id: int, db: Session = Depends(get_db)) -> StylisticsLiteResponse:
-    """Observational sentence / dialogue heuristics for one work."""
+    """Observational prose-oriented stats (word + punctuation heuristics); not tuned for verse."""
     w = db.get(Work, work_id)
     if w is None:
         raise HTTPException(status_code=404, detail="Work not found")
@@ -90,4 +90,21 @@ def work_stylistics(work_id: int, db: Session = Depends(get_db)) -> StylisticsLi
         sentence_count=int(stats["sentence_count"]),
         avg_sentence_length=float(stats["avg_sentence_length"]),
         dialogue_line_markers=int(stats["dialogue_line_markers"]),
+        avg_words_per_sentence=float(stats["avg_words_per_sentence"]),
+        word_count=int(stats["word_count"]),
+        unique_word_types=int(stats["unique_word_types"]),
+        type_token_ratio=float(stats["type_token_ratio"]),
+        comma_count=int(stats["comma_count"]),
+        semicolon_count=int(stats["semicolon_count"]),
+        colon_count=int(stats["colon_count"]),
+        question_mark_count=int(stats["question_mark_count"]),
+        exclamation_mark_count=int(stats["exclamation_mark_count"]),
+        dash_em_en_count=int(stats["dash_em_en_count"]),
+        paren_open_count=int(stats["paren_open_count"]),
+        paren_close_count=int(stats["paren_close_count"]),
+        comma_per_1k_words=float(stats["comma_per_1k_words"]),
+        semicolon_per_1k_words=float(stats["semicolon_per_1k_words"]),
+        colon_per_1k_words=float(stats["colon_per_1k_words"]),
+        question_per_1k_words=float(stats["question_per_1k_words"]),
+        exclamation_per_1k_words=float(stats["exclamation_per_1k_words"]),
     )

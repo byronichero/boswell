@@ -66,11 +66,33 @@ class SemanticSearchResponse(BaseModel):
 
 
 class StylisticsLiteResponse(BaseModel):
-    """Heuristic stats for a single work."""
+    """Heuristic stats for a single work (prose-oriented; see field descriptions)."""
 
     work_id: int
     title: str
     char_count: int
     sentence_count: int
-    avg_sentence_length: float
+    avg_sentence_length: float = Field(
+        ...,
+        description=(
+            "Mean characters per heuristic sentence (. ? !). Skews for verse or unpunctuated prose."
+        ),
+    )
     dialogue_line_markers: int
+    avg_words_per_sentence: float
+    word_count: int
+    unique_word_types: int
+    type_token_ratio: float
+    comma_count: int
+    semicolon_count: int
+    colon_count: int
+    question_mark_count: int
+    exclamation_mark_count: int
+    dash_em_en_count: int = Field(..., description="Unicode em dash (—) and en dash (–) only.")
+    paren_open_count: int
+    paren_close_count: int
+    comma_per_1k_words: float
+    semicolon_per_1k_words: float
+    colon_per_1k_words: float
+    question_per_1k_words: float
+    exclamation_per_1k_words: float
