@@ -1,3 +1,4 @@
+import { useEffect, useState } from "react";
 import {
   Activity,
   BarChart3,
@@ -7,13 +8,14 @@ import {
   Inbox,
   Library,
   ListTree,
+  Menu,
   MessageSquare,
   MessagesSquare,
   Network,
   Search,
   Sparkles,
 } from "lucide-react";
-import { NavLink, Outlet, useLocation } from "react-router-dom";
+import { Link, NavLink, Outlet, useLocation } from "react-router-dom";
 
 import { ChatBubble } from "@/components/chat-bubble";
 import { ThemeToggle } from "@/components/theme-toggle";
@@ -23,41 +25,55 @@ import { useCorpusScope } from "@/contexts/corpus-scope";
 import { useTray } from "@/contexts/tray";
 import { cn } from "@/lib/utils";
 
+const SIDEBAR_COLLAPSED_KEY = "boswell-sidebar-collapsed";
+
 function NavItem({
   to,
   label,
   icon,
+  collapsed,
 }: Readonly<{
   to: string;
   label: string;
   icon: React.ReactNode;
+  collapsed: boolean;
 }>) {
   return (
     <NavLink
       to={to}
+      title={collapsed ? label : undefined}
       className={({ isActive }) =>
         cn(
-          "group flex items-center gap-3 rounded-md px-3 py-2 text-sm transition-colors",
+          "group flex items-center gap-3 rounded-md py-2 text-sm transition-colors",
+          collapsed ? "justify-center px-2" : "px-3",
           isActive
             ? "bg-primary text-primary-foreground"
             : "text-[hsl(var(--sidebar-foreground))] hover:bg-muted",
         )
       }
     >
-      <span className="flex h-6 w-6 items-center justify-center">{icon}</span>
-      <span className="truncate">{label}</span>
+      <span className="flex h-6 w-6 shrink-0 items-center justify-center">{icon}</span>
+      {!collapsed && <span className="truncate">{label}</span>}
     </NavLink>
   );
 }
 
 export default function Layout() {
   const { pathname } = useLocation();
+  const [isSidebarCollapsed, setIsSidebarCollapsed] = useState<boolean>(() => {
+    if (globalThis.window === undefined) return false;
+    return globalThis.window.localStorage.getItem(SIDEBAR_COLLAPSED_KEY) === "true";
+  });
+
+  useEffect(() => {
+    globalThis.window?.localStorage.setItem(SIDEBAR_COLLAPSED_KEY, String(isSidebarCollapsed));
+  }, [isSidebarCollapsed]);
+
   const isHome = pathname === "/";
   const isGraphLab = pathname === "/graph-lab";
   let contentMaxWidthClass = "max-w-6xl";
-  if (isHome) {
-    contentMaxWidthClass = "max-w-4xl";
-  } else if (isGraphLab) {
+  if (isHome || isGraphLab) {
+    // Home: room for chat + Quick actions; Graph Lab: wide Memgraph embed.
     contentMaxWidthClass = "max-w-7xl";
   }
   const { periods, periodId, setPeriodId, softScope, setSoftScope, scopeInfo } = useCorpusScope();
@@ -65,41 +81,98 @@ export default function Layout() {
 
   return (
     <div className="flex min-h-screen bg-background text-foreground">
-      {/* Sidebar */}
-      <aside className="hidden w-64 flex-col border-r bg-[hsl(var(--sidebar))] md:flex">
-        <div className="flex items-center gap-3 px-4 py-4">
-          <img
-            src="/boswell.jpg"
-            alt="Boswell"
-            className="h-10 w-10 rounded-md object-cover ring-1 ring-border"
-          />
-          <div className="min-w-0">
-            <div className="truncate font-serif text-lg font-semibold">Boswell</div>
-            <div className="truncate text-xs text-muted-foreground">
-              Your faithful literary companion
-            </div>
-          </div>
+      {/* Sidebar — collapsible (Richelieu-style): icon rail when minimized */}
+      <aside
+        className={cn(
+          "hidden min-h-0 flex-col border-r bg-[hsl(var(--sidebar))] transition-all duration-200 md:flex",
+          isSidebarCollapsed ? "w-20" : "w-64",
+        )}
+      >
+        <div className="flex h-[4.5rem] shrink-0 items-center justify-between gap-2 border-b border-border/60 px-2">
+          <Link
+            to="/"
+            className={cn(
+              "flex min-w-0 items-center gap-3 rounded-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-[hsl(var(--sidebar))]",
+              isSidebarCollapsed ? "flex-1 justify-center" : "flex-1",
+            )}
+          >
+            <img
+              src="/boswell.jpg"
+              alt="Boswell"
+              className="h-10 w-10 shrink-0 rounded-md object-cover ring-1 ring-border"
+            />
+            {!isSidebarCollapsed && (
+              <div className="min-w-0">
+                <div className="truncate font-serif text-lg font-semibold">Boswell</div>
+                <div className="truncate text-xs text-muted-foreground">Your faithful literary companion</div>
+              </div>
+            )}
+          </Link>
+          <button
+            type="button"
+            onClick={() => setIsSidebarCollapsed((v) => !v)}
+            aria-label={isSidebarCollapsed ? "Expand sidebar" : "Collapse sidebar"}
+            aria-expanded={!isSidebarCollapsed}
+            className="shrink-0 rounded-md p-2 text-[hsl(var(--sidebar-foreground))]/80 transition-colors hover:bg-muted hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+          >
+            <Menu className="h-5 w-5" aria-hidden />
+          </button>
         </div>
-        <nav className="flex-1 space-y-1 px-3 pb-4">
-          <NavItem to="/" label="Home" icon={<Home className="h-4 w-4" />} />
-          <NavItem to="/corpus" label="Corpus" icon={<Library className="h-4 w-4" />} />
-          <NavItem to="/concordance" label="Concordance" icon={<Search className="h-4 w-4" />} />
-          <NavItem to="/keywords" label="Keywords" icon={<ListTree className="h-4 w-4" />} />
-          <NavItem to="/semantic" label="Semantic" icon={<Sparkles className="h-4 w-4" />} />
-          <NavItem to="/stylistics" label="Stylistics" icon={<BarChart3 className="h-4 w-4" />} />
-          <NavItem to="/synthesize" label="Synthesize" icon={<MessageSquare className="h-4 w-4" />} />
-          <NavItem to="/chat" label="Evidence chat" icon={<MessagesSquare className="h-4 w-4" />} />
-          <NavItem to="/knowledge-base" label="Knowledge Base" icon={<Inbox className="h-4 w-4" />} />
-          <NavItem to="/graph-lab" label="Graph Lab" icon={<Network className="h-4 w-4" />} />
+        <nav className="min-h-0 flex-1 space-y-1 overflow-y-auto overscroll-contain px-2 py-3 pb-4">
+          <NavItem collapsed={isSidebarCollapsed} to="/" label="Home" icon={<Home className="h-4 w-4" />} />
+          <NavItem collapsed={isSidebarCollapsed} to="/corpus" label="Corpus" icon={<Library className="h-4 w-4" />} />
+          <NavItem
+            collapsed={isSidebarCollapsed}
+            to="/concordance"
+            label="Concordance"
+            icon={<Search className="h-4 w-4" />}
+          />
+          <NavItem collapsed={isSidebarCollapsed} to="/keywords" label="Keywords" icon={<ListTree className="h-4 w-4" />} />
+          <NavItem collapsed={isSidebarCollapsed} to="/semantic" label="Semantic" icon={<Sparkles className="h-4 w-4" />} />
+          <NavItem
+            collapsed={isSidebarCollapsed}
+            to="/stylistics"
+            label="Stylistics"
+            icon={<BarChart3 className="h-4 w-4" />}
+          />
+          <NavItem
+            collapsed={isSidebarCollapsed}
+            to="/synthesize"
+            label="Synthesize"
+            icon={<MessageSquare className="h-4 w-4" />}
+          />
+          <NavItem
+            collapsed={isSidebarCollapsed}
+            to="/chat"
+            label="Evidence chat"
+            icon={<MessagesSquare className="h-4 w-4" />}
+          />
+          <NavItem
+            collapsed={isSidebarCollapsed}
+            to="/knowledge-base"
+            label="Knowledge Base"
+            icon={<Inbox className="h-4 w-4" />}
+          />
+          <NavItem collapsed={isSidebarCollapsed} to="/graph-lab" label="Graph Lab" icon={<Network className="h-4 w-4" />} />
           <div className="my-2 border-t border-border/60" />
-          <NavItem to="/tutorial" label="Getting started" icon={<GraduationCap className="h-4 w-4" />} />
-          <NavItem to="/status" label="Status" icon={<Activity className="h-4 w-4" />} />
-          <NavItem to="/faq" label="FAQ" icon={<HelpCircle className="h-4 w-4" />} />
-          <NavItem to="/help" label="Help" icon={<HelpCircle className="h-4 w-4" />} />
+          <NavItem
+            collapsed={isSidebarCollapsed}
+            to="/tutorial"
+            label="Getting started"
+            icon={<GraduationCap className="h-4 w-4" />}
+          />
+          <NavItem collapsed={isSidebarCollapsed} to="/status" label="Status" icon={<Activity className="h-4 w-4" />} />
+          <NavItem collapsed={isSidebarCollapsed} to="/faq" label="FAQ" icon={<HelpCircle className="h-4 w-4" />} />
+          <NavItem collapsed={isSidebarCollapsed} to="/help" label="Help" icon={<HelpCircle className="h-4 w-4" />} />
         </nav>
-        <div className="border-t px-4 py-4">
-          <div className="flex items-center justify-between">
-            <div className="text-xs text-muted-foreground">Theme</div>
+        <div className="shrink-0 border-t px-2 py-4">
+          <div
+            className={cn(
+              "flex items-center gap-2",
+              isSidebarCollapsed ? "flex-col justify-center" : "justify-between",
+            )}
+          >
+            {!isSidebarCollapsed && <div className="text-xs text-muted-foreground">Theme</div>}
             <ThemeToggle />
           </div>
         </div>

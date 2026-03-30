@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 
+import { CopyTextButton } from "@/components/copy-text-button";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Textarea } from "@/components/ui/textarea";
@@ -44,7 +45,10 @@ export function ChatBubble({ className }: Readonly<{ className?: string }>) {
           <CardContent className="space-y-2">
             {last && (
               <div className="rounded-md border bg-muted/30 p-2 text-xs text-muted-foreground">
-                <div className="mb-1 font-medium">{last.role === "user" ? "You" : "Boswell"}</div>
+                <div className="mb-1 flex items-center justify-between gap-2">
+                  <span className="font-medium">{last.role === "user" ? "You" : "Boswell"}</span>
+                  <CopyTextButton text={last.content} aria-label="Copy last message" className="h-6 w-6" />
+                </div>
                 <div className="line-clamp-4 whitespace-pre-wrap">{last.content}</div>
               </div>
             )}

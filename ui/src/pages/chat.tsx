@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 
+import { CopyTextButton } from "@/components/copy-text-button";
 import { OllamaModelSelect } from "@/components/ollama-model-select";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -82,10 +83,13 @@ export default function ChatPage() {
             <div className="space-y-3">
               {messages.map((m) => (
                 <div key={m.id} className="rounded-md border bg-muted/30 p-3">
-                  <div className="mb-1 flex items-center justify-between">
+                  <div className="mb-1 flex items-center justify-between gap-2">
                     <div className="text-xs font-medium text-muted-foreground">{formatRole(m.role)}</div>
-                    <div className="text-[10px] text-muted-foreground">
-                      {new Date(m.createdAtMs).toLocaleTimeString()}
+                    <div className="flex shrink-0 items-center gap-0.5">
+                      <CopyTextButton text={m.content} aria-label="Copy message" />
+                      <span className="text-[10px] text-muted-foreground tabular-nums">
+                        {new Date(m.createdAtMs).toLocaleTimeString()}
+                      </span>
                     </div>
                   </div>
                   <div className="whitespace-pre-wrap text-sm leading-relaxed">{m.content}</div>
@@ -161,20 +165,23 @@ export default function ChatPage() {
                         {h.locator} · score {h.score.toFixed(3)}
                       </div>
                     </div>
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={async () =>
-                        addItem({
-                          work_id: h.work_id,
-                          locator: h.locator,
-                          excerpt: h.text,
-                          note: `Proposed evidence (semantic score ${h.score.toFixed(3)}): "${evidenceQuery.trim()}"`,
-                        })
-                      }
-                    >
-                      Add to tray
-                    </Button>
+                    <div className="flex shrink-0 items-center gap-1">
+                      <CopyTextButton text={h.text} aria-label="Copy excerpt" />
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={async () =>
+                          addItem({
+                            work_id: h.work_id,
+                            locator: h.locator,
+                            excerpt: h.text,
+                            note: `Proposed evidence (semantic score ${h.score.toFixed(3)}): "${evidenceQuery.trim()}"`,
+                          })
+                        }
+                      >
+                        Add to tray
+                      </Button>
+                    </div>
                   </div>
                   <div className="mt-2 whitespace-pre-wrap text-sm">{h.text}</div>
                 </div>
