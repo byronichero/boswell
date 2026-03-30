@@ -19,6 +19,7 @@ import { Link, NavLink, Outlet, useLocation } from "react-router-dom";
 
 import { ChatBubble } from "@/components/chat-bubble";
 import { ThemeToggle } from "@/components/theme-toggle";
+import { TtsPresetSelect } from "@/components/tts-preset-select";
 import { TtsVoiceSelect } from "@/components/tts-voice-select";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -183,11 +184,18 @@ export default function Layout() {
               <ThemeToggle />
             </div>
             {(isHome || isGraphLab) && (
-              <TtsVoiceSelect
-                id="sidebar-tts-voice"
-                compact={isSidebarCollapsed}
-                className={cn(isSidebarCollapsed ? "w-full flex-col items-stretch gap-1" : "")}
-              />
+              <>
+                <TtsVoiceSelect
+                  id="sidebar-tts-voice"
+                  compact={isSidebarCollapsed}
+                  className={cn(isSidebarCollapsed ? "w-full flex-col items-stretch gap-1" : "")}
+                />
+                <TtsPresetSelect
+                  id="sidebar-tts-preset"
+                  compact={isSidebarCollapsed}
+                  className={cn(isSidebarCollapsed ? "w-full flex-col items-stretch gap-1" : "")}
+                />
+              </>
             )}
           </div>
         </div>
@@ -198,6 +206,7 @@ export default function Layout() {
         {(isHome || isGraphLab) && (
           <div className="flex flex-wrap items-center justify-end gap-2 border-b bg-background/85 px-4 py-2 md:hidden">
             <TtsVoiceSelect id="mobile-home-tts-voice" compact />
+            <TtsPresetSelect id="mobile-home-tts-preset" compact />
             <ThemeToggle />
           </div>
         )}
@@ -235,6 +244,7 @@ export default function Layout() {
             </label>
 
             <TtsVoiceSelect id="header-tts-voice" className="w-full sm:w-auto" />
+            <TtsPresetSelect id="header-tts-preset" className="w-full sm:w-auto" />
 
             <div className="ml-auto flex items-center gap-2 md:hidden">
               <ThemeToggle />

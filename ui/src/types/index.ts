@@ -201,13 +201,14 @@ export interface ChatOpenResponse {
 
 /**
  * POST /api/tts — Kokoro TTS (proxied to kokoro-tts container).
- * Defaults: British English (`lang_code` b); voice from Read-aloud control (bm_george / bf_lily).
+ * Defaults: British English (`lang_code` b); voice + `preset` from read-aloud controls.
  */
 export interface TtsRequest {
   text: string;
   voice?: string;
   lang_code?: string;
-  speed?: number;
+  /** `narration` (calmer) vs `preview` (faster) — Kokoro-only, same model. */
+  preset?: "narration" | "preview";
 }
 
 export interface HealthResponse {

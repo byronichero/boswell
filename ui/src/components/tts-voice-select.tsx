@@ -18,7 +18,7 @@ export function TtsVoiceSelect({ id, compact, className, disabled }: TtsVoiceSel
   return (
     <div className={cn("flex min-w-0 items-center gap-2", className)}>
       <label htmlFor={id} className="shrink-0 text-sm text-muted-foreground">
-        {compact ? "Voice" : "Read-aloud"}
+        Voice
       </label>
       <select
         id={id}

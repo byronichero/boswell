@@ -4,7 +4,7 @@ from __future__ import annotations
 
 import logging
 from io import BytesIO
-from typing import Any
+from typing import Any, Literal
 
 import numpy as np
 import soundfile as sf
@@ -16,9 +16,19 @@ logger = logging.getLogger(__name__)
 
 SAMPLE_RATE = 24_000
 
+# Kokoro-only: same model; presets trade calmer delivery vs faster playback. Paragraph splits reduce
+# chunk-boundary prosody resets vs splitting on every newline (see KPipeline split_pattern).
+_PRESET_SPEED_SPLIT: dict[str, tuple[float, str]] = {
+    "narration": (0.9, r"\n\n+"),
+    "preview": (1.16, r"\n\n+"),
+}
+
 _pipeline_cache: dict[str, Any] = {}
 
 app = FastAPI(title="Kokoro TTS", version="1.0.0")
+
+
+TtsPreset = Literal["narration", "preview"]
 
 
 class TtsRequest(BaseModel):
@@ -32,7 +42,10 @@ class TtsRequest(BaseModel):
         max_length=8,
         description="Kokoro language code: b=British English (default for literature), a=American English.",
     )
-    speed: float = Field(default=1.0, ge=0.5, le=2.0)
+    preset: TtsPreset = Field(
+        default="narration",
+        description="narration: calmer, slower; preview: faster playback (same Kokoro model).",
+    )
 
 
 def _get_pipeline(lang_code: str) -> Any:
@@ -69,12 +82,13 @@ def synthesize(body: TtsRequest) -> Response:
         raise HTTPException(status_code=400, detail="text is empty")
 
     pipeline = _get_pipeline(body.lang_code)
+    speed, split_pattern = _PRESET_SPEED_SPLIT[body.preset]
     chunks: list[np.ndarray] = []
     generator = pipeline(
         text,
         voice=body.voice,
-        speed=body.speed,
-        split_pattern=r"\n+",
+        speed=speed,
+        split_pattern=split_pattern,
     )
     for _gs, _ps, audio in generator:
         chunks.append(_to_numpy(audio))

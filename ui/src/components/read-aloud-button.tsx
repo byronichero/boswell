@@ -39,7 +39,7 @@ export function ReadAloudButton({
   variant = "default",
   iconTone = "default",
 }: ReadAloudButtonProps) {
-  const { voice, langCode } = useTtsVoice();
+  const { voice, langCode, readingPreset } = useTtsVoice();
   const [phase, setPhase] = useState<"idle" | "loading" | "playing">("idle");
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const objectUrlRef = useRef<string | null>(null);
@@ -68,7 +68,12 @@ export function ReadAloudButton({
     cleanup();
     setPhase("loading");
     try {
-      const blob = await api.postTts({ text: t, voice, lang_code: langCode });
+      const blob = await api.postTts({
+        text: t,
+        voice,
+        lang_code: langCode,
+        preset: readingPreset,
+      });
       const url = URL.createObjectURL(blob);
       objectUrlRef.current = url;
       const audio = new Audio(url);
@@ -84,7 +89,7 @@ export function ReadAloudButton({
       onError?.(e instanceof Error ? e.message : String(e));
       cleanup();
     }
-  }, [text, disabled, cleanup, onError, voice, langCode]);
+  }, [text, disabled, cleanup, onError, voice, langCode, readingPreset]);
 
   const busy = phase !== "idle";
 
