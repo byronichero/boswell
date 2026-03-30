@@ -8,12 +8,14 @@ import { CorpusScopeProvider } from "@/contexts/corpus-scope";
 import { OllamaModelProvider } from "@/contexts/ollama-model";
 import { ThemeProvider } from "@/contexts/theme";
 import { TrayProvider } from "@/contexts/tray";
+import { TtsVoiceProvider } from "@/contexts/tts-voice";
 import "@/index.css";
 
 ReactDOM.createRoot(document.getElementById("root")!).render(
   <React.StrictMode>
     <BrowserRouter>
       <ThemeProvider>
+        <TtsVoiceProvider>
         <TrayProvider>
           <CorpusScopeProvider>
             <OllamaModelProvider>
@@ -23,6 +25,7 @@ ReactDOM.createRoot(document.getElementById("root")!).render(
             </OllamaModelProvider>
           </CorpusScopeProvider>
         </TrayProvider>
+        </TtsVoiceProvider>
       </ThemeProvider>
     </BrowserRouter>
   </React.StrictMode>,

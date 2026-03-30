@@ -2,6 +2,7 @@ import { Loader2, Volume2 } from "lucide-react";
 import { useCallback, useEffect, useRef, useState } from "react";
 
 import { Button } from "@/components/ui/button";
+import { useTtsVoice } from "@/contexts/tts-voice";
 import { api } from "@/lib/api";
 import { cn } from "@/lib/utils";
 
@@ -38,6 +39,7 @@ export function ReadAloudButton({
   variant = "default",
   iconTone = "default",
 }: ReadAloudButtonProps) {
+  const { voice, langCode } = useTtsVoice();
   const [phase, setPhase] = useState<"idle" | "loading" | "playing">("idle");
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const objectUrlRef = useRef<string | null>(null);
@@ -45,6 +47,8 @@ export function ReadAloudButton({
   const cleanup = useCallback(() => {
     const a = audioRef.current;
     if (a) {
+      a.onerror = null;
+      a.onended = null;
       a.pause();
       a.src = "";
     }
@@ -64,7 +68,7 @@ export function ReadAloudButton({
     cleanup();
     setPhase("loading");
     try {
-      const blob = await api.postTts({ text: t });
+      const blob = await api.postTts({ text: t, voice, lang_code: langCode });
       const url = URL.createObjectURL(blob);
       objectUrlRef.current = url;
       const audio = new Audio(url);
@@ -80,7 +84,7 @@ export function ReadAloudButton({
       onError?.(e instanceof Error ? e.message : String(e));
       cleanup();
     }
-  }, [text, disabled, cleanup, onError]);
+  }, [text, disabled, cleanup, onError, voice, langCode]);
 
   const busy = phase !== "idle";
 

@@ -25,8 +25,13 @@ class TtsRequest(BaseModel):
     """Request body for speech synthesis."""
 
     text: str = Field(..., max_length=50_000, description="Plain text; newlines preserved for poetry.")
-    voice: str = Field(default="af_heart", max_length=64)
-    lang_code: str = Field(default="a", min_length=1, max_length=8, description="Kokoro language code, e.g. a=American English.")
+    voice: str = Field(default="bm_george", max_length=64)
+    lang_code: str = Field(
+        default="b",
+        min_length=1,
+        max_length=8,
+        description="Kokoro language code: b=British English (default for literature), a=American English.",
+    )
     speed: float = Field(default=1.0, ge=0.5, le=2.0)
 
 

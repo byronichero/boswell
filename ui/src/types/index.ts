@@ -199,7 +199,10 @@ export interface ChatOpenResponse {
   message: string;
 }
 
-/** POST /api/tts — Kokoro TTS (proxied to kokoro-tts container). */
+/**
+ * POST /api/tts — Kokoro TTS (proxied to kokoro-tts container).
+ * Defaults: British English (`lang_code` b); voice from Read-aloud control (bm_george / bf_lily).
+ */
 export interface TtsRequest {
   text: string;
   voice?: string;
