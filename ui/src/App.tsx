@@ -5,8 +5,10 @@ import Layout from "@/components/layout";
 import { SplashScreen } from "@/components/splash-screen";
 import ConcordancePage from "@/pages/concordance";
 import CorpusPage from "@/pages/corpus";
+import HomePage from "@/pages/home";
 import ChatPage from "@/pages/chat";
 import FaqPage from "@/pages/faq";
+import GraphLabPage from "@/pages/graph-lab";
 import HelpPage from "@/pages/help";
 import KnowledgeBasePage from "@/pages/knowledge-base";
 import KeywordsPage from "@/pages/keywords";
@@ -35,7 +37,8 @@ export function App() {
   return (
     <Routes>
       <Route path="/" element={<Layout />}>
-        <Route index element={<CorpusPage />} />
+        <Route index element={<HomePage />} />
+        <Route path="corpus" element={<CorpusPage />} />
         <Route path="concordance" element={<ConcordancePage />} />
         <Route path="keywords" element={<KeywordsPage />} />
         <Route path="semantic" element={<SemanticPage />} />
@@ -43,6 +46,7 @@ export function App() {
         <Route path="synthesize" element={<SynthesizePage />} />
         <Route path="chat" element={<ChatPage />} />
         <Route path="knowledge-base" element={<KnowledgeBasePage />} />
+        <Route path="graph-lab" element={<GraphLabPage />} />
         <Route path="status" element={<StatusPage />} />
         <Route path="faq" element={<FaqPage />} />
         <Route path="help" element={<HelpPage />} />

@@ -12,6 +12,10 @@ class SynthesizeRequest(BaseModel):
     question: str = Field(..., min_length=1)
     period_id: int | None = None
     soft_scope: bool = True
+    model: str | None = Field(
+        default=None,
+        description="Ollama chat model; defaults to OLLAMA_CHAT_MODEL when omitted.",
+    )
 
 
 class SynthesizeResponse(BaseModel):

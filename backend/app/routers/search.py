@@ -16,7 +16,7 @@ from app.schemas.search import (
     SemanticSearchRequest,
     SemanticSearchResponse,
 )
-from app.services.neo4j_sync import work_ids_for_periods
+from app.services.memgraph_sync import work_ids_for_periods
 from app.services.ollama_client import embed_texts
 from app.services.qdrant_chunks import search_chunks
 from app.services.scope import resolve_scope_period_ids, work_ids_for_periods_sql
@@ -40,7 +40,7 @@ def _scoped_work_ids(db: Session, period_id: int | None, soft: bool) -> tuple[li
         if neo:
             return neo, scope_ids
     except Exception:
-        logger.warning("Neo4j scope failed; falling back to SQL", exc_info=True)
+        logger.warning("Memgraph scope failed; falling back to SQL", exc_info=True)
     return work_ids_for_periods_sql(db, scope_ids), scope_ids
 
 

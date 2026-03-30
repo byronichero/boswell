@@ -66,7 +66,7 @@ export default function HelpPage() {
           title="Troubleshooting"
           body={
             <>
-              If semantic search or synthesis fails, check <strong>App status</strong>. Neo4j and Qdrant are optional
+              If semantic search or synthesis fails, check <strong>App status</strong>. Memgraph and Qdrant are optional
               but recommended; Ollama must be reachable for synthesis.
             </>
           }

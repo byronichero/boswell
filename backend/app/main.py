@@ -8,7 +8,17 @@ from fastapi.middleware.cors import CORSMiddleware
 
 from app.config import cors_origins_list, get_settings
 from app.db import Base, engine
-from app.routers import analysis, documents, evidence_tray, health, periods, search, works
+from app.routers import (
+    analysis,
+    chat_open,
+    documents,
+    evidence_tray,
+    health,
+    ollama_tools,
+    periods,
+    search,
+    works,
+)
 from app.services.bootstrap import run_startup_bootstrap
 
 
@@ -44,6 +54,8 @@ app.include_router(evidence_tray.router, prefix="/api/evidence-tray", tags=["evi
 app.include_router(documents.router, prefix="/api/documents", tags=["documents"])
 app.include_router(search.router, prefix="/api/search", tags=["search"])
 app.include_router(analysis.router, prefix="/api/analysis", tags=["analysis"])
+app.include_router(chat_open.router, prefix="/api/chat", tags=["chat"])
+app.include_router(ollama_tools.router, prefix="/api/ollama", tags=["ollama"])
 
 
 @app.get("/")

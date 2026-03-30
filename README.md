@@ -1,6 +1,6 @@
 # Boswell
 
-English-literature analysis stack: **FastAPI** + **Postgres** + **Neo4j** (period scoping) + **Qdrant** (semantic chunks) + **Ollama** on the host (embeddings + synthesis). See [`boswell-prd.md`](boswell-prd.md) for the full product spec.
+English-literature analysis stack: **FastAPI** + **Postgres** + **Memgraph** (period scoping) + **Qdrant** (semantic chunks) + **Ollama** on the host (embeddings + synthesis). See [`boswell-prd.md`](boswell-prd.md) for the full product spec.
 
 ## Prerequisites
 
@@ -18,17 +18,18 @@ docker compose up --build
 
 - **API**: [http://localhost:8000](http://localhost:8000) — OpenAPI at `/docs`
 - **UI**: [http://localhost:5173](http://localhost:5173) — Vite dev server proxies `/api` and `/health` to the backend
+- **Memgraph Lab** (`memgraph-lab` service): graph explorer; Quick Connect uses the `memgraph` Bolt service. With Compose, Lab is at `http://localhost:3000/memgraph-lab/` on the host (port 3000 published). The **Graph Lab** page (`/graph-lab`) embeds Lab via the same origin as the UI (`/memgraph-lab/` proxied by Vite to `memgraph-lab`), which avoids cross-origin iframe restrictions.
 - **Postgres (host access)**: mapped to **localhost:5435** so it does not clash with a local server on 5432. Containers still use `db:5432` internally.
 
 ## Initialize data
 
-After containers are up, load periods, the bundled `docs/gutenberg/shakespeare-sonnet-18.txt`, Neo4j graph, and Qdrant vectors:
+After containers are up, load periods, the bundled `docs/gutenberg/shakespeare-sonnet-18.txt`, Memgraph graph, and Qdrant vectors:
 
 ```bash
 docker compose exec backend python /app/scripts/init_data.py
 ```
 
-Use `--force` to reset the DB and vector collection (development only). Use `--skip-qdrant` or `--skip-neo4j` if those services are unavailable.
+Use `--force` to reset the DB and vector collection (development only). Use `--skip-qdrant` or `--skip-memgraph` if those services are unavailable.
 
 ## Project layout
 

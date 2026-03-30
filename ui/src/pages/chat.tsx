@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 
+import { OllamaModelSelect } from "@/components/ollama-model-select";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -47,11 +48,16 @@ export default function ChatPage() {
   return (
     <div className="space-y-4">
       <Card>
-        <CardHeader>
-          <CardTitle>Chat (evidence-grounded)</CardTitle>
-          <CardDescription>
-            Ask questions; answers must be supported by your Evidence tray excerpts and cite them as [T1], [T2], …
-          </CardDescription>
+        <CardHeader className="space-y-3">
+          <div className="flex flex-col gap-3 lg:flex-row lg:items-start lg:justify-between">
+            <div>
+              <CardTitle>Chat (evidence-grounded)</CardTitle>
+              <CardDescription>
+                Ask questions; answers must be supported by your Evidence tray excerpts and cite them as [T1], [T2], …
+              </CardDescription>
+            </div>
+            <OllamaModelSelect id="evidence-chat-ollama-model" disabled={isSending} />
+          </div>
         </CardHeader>
         <CardContent className="space-y-3">
           <div className="flex flex-wrap items-center gap-2">

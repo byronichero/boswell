@@ -53,7 +53,7 @@
 | **Python backend** | Rich NLP ecosystem, fast API. | FastAPI + Pydantic + SQLAlchemy |
 | **Open‑source LLM** | Avoid API costs, full control. | **Ollama** (host localhost only) |
 | **Vector search** | Fast semantic retrieval of relevant passages. | Qdrant |
-| **Search indexing** | Keyword + full‑text search. | Neo4j (graph) + Qdrant (vector) |
+| **Search indexing** | Keyword + full‑text search. | Memgraph (graph) + Qdrant (vector) |
 | **Web UI** | User‑friendly interaction. | React + Next.js (static build) or HTMX |
 | **LLM inference** | Local chat + embeddings. | Ollama (host localhost only) |
 | **CI/CD** | Quality & reproducibility. | GitHub Actions + Docker Hub |
@@ -67,7 +67,7 @@
 | Backend | Python 3.10+, FastAPI | REST API, async handlers |
 | Database | PostgreSQL (asyncpg) | Works, periods, authors, and generated analyses |
 | Vector Store | Qdrant | Literary text chunk embeddings, semantic search |
-| Graph | Neo4j | Authors/books/period relationships, semantic analytics |
+| Graph | Memgraph | Authors/books/period relationships, semantic analytics |
 | Cache | Redis | Sessions, caching |
 | Object Storage | MinIO (S3-compatible) | User uploads and downloadable analysis artifacts (Markdown/HTML) |
 | AI | Ollama (default) | Chat + embeddings for analysis |
@@ -103,7 +103,7 @@
 └─────────────┬─────────┘
               │ Graph
 ┌─────────────▼─────────┐
-│  Neo4j                |  ← Stores period scoping + author/work relationships
+│  Memgraph                |  ← Stores period scoping + author/work relationships
 └─────────────┬─────────┘
               │ Vector
 ┌─────────────▼─────────┐
@@ -118,7 +118,7 @@
 **Flow**  
 1. User selects a period (**soft scoping** by default: neighbor periods or year window; **hard scoping** optional later) and uses tool tabs (Concordance, Keywords, Stylistics) to explore the corpus.  
 2. Selected excerpts accumulate in a persistent **Evidence tray** (work + stable locator + optional note).  
-3. FastAPI resolves eligible works via Neo4j; Qdrant retrieves relevant chunks when the user searches semantically.  
+3. FastAPI resolves eligible works via Memgraph; Qdrant retrieves relevant chunks when the user searches semantically.  
 4. **Synthesize analysis** consumes the tray (plus optional free‑text prompt): Ollama must ground claims in tray items and cite them by tray id.  
 5. Analysis results are stored in Postgres; optional tray + synthesis exports (Markdown/HTML) to MinIO.
 
@@ -157,7 +157,7 @@ The Evidence tray is a **persistent panel** visible across all tabs. It is the *
 - Optional: export tray + notes as Markdown (MinIO or download).
 
 ### Period scoping: soft first, hard later
-- **Default (soft):** Neo4j/Qdrant candidate works include the selected period plus **neighbor periods** (table order) or a **year window** around period boundaries—configurable.
+- **Default (soft):** Memgraph/Qdrant candidate works include the selected period plus **neighbor periods** (table order) or a **year window** around period boundaries—configurable.
 - **Later (hard):** Strict filter to works whose period/year falls only inside the selected era.
 
 ### API sketch (Evidence tray)
@@ -172,7 +172,7 @@ Add routes such as `GET/POST/PATCH/DELETE /evidence-tray/...` (or session-scoped
 | **FR‑003** | Keywords | Frequency-style term lists over the current scope (English stopword list configurable). | User can open contexts and **add to tray**. | P0 |
 | **FR‑004** | Stylistics (lite) | Heuristic metrics only (e.g. sentence-length stats, simple dialogue markers); not full stylometry. | UI labels output **observational**; user may attach supporting **excerpts to tray** where applicable. | P1 |
 | **FR‑005** | Evidence tray | Persistent panel across tabs: create, list, update, delete, reorder, per-item **note**. | Every item has `tray_item_id`, locator, excerpt; tray state persisted (session or Postgres per user). | P0 |
-| **FR‑006** | Semantic search | Vector retrieval over **Qdrant** chunks restricted to Neo4j-scoped `work_id`s. | Results show score, excerpt, work ref; **add to tray**. | P0 |
+| **FR‑006** | Semantic search | Vector retrieval over **Qdrant** chunks restricted to Memgraph-scoped `work_id`s. | Results show score, excerpt, work ref; **add to tray**. | P0 |
 | **FR‑007** | Synthesize | Analysis from **tray + prompt**; model must **cite tray ids** and not invent quotations. | Output uses explicit references (e.g. `[T1]`, `[T2]`) tied to tray items; optional structured JSON + Markdown. | P0 |
 | **FR‑008** | Export | Download tray + notes and/or synthesis as Markdown (optional HTML). | File download and/or MinIO presigned URL. | P1 |
 | **FR‑009** | Period scoping | **Soft** filter default (neighbor periods or year window); **hard** filter available later. | Soft mode shows **which** neighbor periods or window is active in the UI. | P0 |
@@ -185,7 +185,7 @@ Add routes such as `GET/POST/PATCH/DELETE /evidence-tray/...` (or session-scoped
 | **NFR‑002** | Performance | Semantic search remains usable under normal load. | **p95 under 5 s** for Qdrant top‑k over scoped `work_id`s (tune `k`, chunk size, and hardware assumptions). | P0 |
 | **NFR‑003** | Performance | Synthesis may be slow; avoid opaque hangs. | Configurable **Ollama timeout** (e.g. 120–600 s, env-driven); show progress / cancel where feasible. | P0 |
 | **NFR‑004** | Capacity | Evidence tray must stay within model context limits. | **Max tray items** (e.g. 20–50) and/or **max total excerpt characters** with UI warning before synthesis. | P0 |
-| **NFR‑005** | Reliability | Core app works when optional services misbehave. | Clear errors when **Ollama**, **Qdrant**, or **Neo4j** is unreachable; read-only browse may still work from Postgres where possible. | P0 |
+| **NFR‑005** | Reliability | Core app works when optional services misbehave. | Clear errors when **Ollama**, **Qdrant**, or **Memgraph** is unreachable; read-only browse may still work from Postgres where possible. | P0 |
 | **NFR‑006** | Security | No secrets in frontend; safe defaults. | API keys and DB passwords only via **env** / secrets manager; document `.env.example` only with placeholders. | P0 |
 | **NFR‑007** | Privacy (local-first) | Default deployment keeps analysis on user-controlled infra. | **Ollama + MinIO on localhost** by default; document that cloud LLM is out-of-scope unless explicitly configured. | P0 |
 | **NFR‑008** | Accessibility | Core flows usable with keyboard and screen readers where practical. | Target **WCAG 2.1 AA** for primary navigation, tray, and synthesis (iterate; full audit P1). | P1 |
@@ -283,7 +283,7 @@ services:
       - "8000:8000"
     depends_on:
       - db
-      - neo4j
+      - memgraph
       - qdrant
 
   db:
@@ -296,14 +296,11 @@ services:
     volumes:
       - pgdata:/var/lib/postgresql/data
 
-  neo4j:
-    image: neo4j:5.9
+  memgraph:
+    image: memgraph/memgraph:latest
     restart: unless-stopped
-    environment:
-      NEO4J_AUTH: neo4j/password
     ports:
       - "7687:7687"   # Bolt
-      - "7474:7474"   # HTTP
 
   qdrant:
     image: qdrant/qdrant:latest
@@ -479,7 +476,7 @@ async def generate_analysis(
     req: AnalysisRequest,
     db: Session = Depends(get_db),
 ) -> AnalysisResponse:
-    # MVP: use Neo4j for period scoping + Qdrant for chunk retrieval + Ollama for synthesis.
+    # MVP: use Memgraph for period scoping + Qdrant for chunk retrieval + Ollama for synthesis.
     return await analyze_literature(req=req, db=db)
 ```
 
@@ -492,8 +489,8 @@ import json
 from typing import List
 
 class SearchService:
-    def __init__(self, neo4j_uri: str, qdrant_url: str):
-        self.neo4j_uri = neo4j_uri
+    def __init__(self, memgraph_uri: str, qdrant_url: str):
+        self.memgraph_uri = memgraph_uri
         self.qdrant_url = qdrant_url
 
     async def semantic_search(
@@ -504,7 +501,7 @@ class SearchService:
         period_id: int | None = None,
         work_ids: List[int] | None = None,
     ) -> List[int]:
-        # 1) Neo4j scoping:
+        # 1) Memgraph scoping:
         #    - resolve candidate works by period_id (or accept provided work_ids)
         # 2) Qdrant retrieval:
         #    - embed query
@@ -513,7 +510,7 @@ class SearchService:
         pass
 ```
 
-> **Implementation detail** – Use `neo4j-driver` for Cypher queries; use `qdrant-client` or `httpx` to query Qdrant for embeddings.
+> **Implementation detail** – Use the official Bolt driver (`neo4j` Python package) against Memgraph; use `qdrant-client` or `httpx` to query Qdrant for embeddings.
 
 ### 7.6 Generation Service (`app/services/generation.py`)
 
@@ -612,14 +609,14 @@ if __name__ == "__main__":
     seed_db()
 ```
 
-> **How to use** – Start the docker stack (backend + Postgres + Neo4j + Qdrant). Ensure Ollama + MinIO are running on the host.  
+> **How to use** – Start the docker stack (backend + Postgres + Memgraph + Qdrant). Ensure Ollama + MinIO are running on the host.  
 > Then run `docker compose up -d backend` and `docker compose exec backend python /app/scripts/init_data.py`.  
 
 After seeding, run an indexing job (MVP sketch) that:
 1. Chunks each `Work.content` from Postgres.
 2. Embeds the chunks using Ollama embeddings.
 3. Upserts chunk vectors + metadata into Qdrant (e.g. `work_id`, `period_id`, `chunk_index`, and a truncated `text` field for context).
-4. Creates Neo4j relationships for period scoping (e.g. `(:Work)-[:IN_PERIOD]->(:Period)` and `(:Work)-[:WRITTEN_BY]->(:Author)`).
+4. Creates Memgraph relationships for period scoping (e.g. `(:Work)-[:IN_PERIOD]->(:Period)` and `(:Work)-[:WRITTEN_BY]->(:Author)`).
 
 ---
 
@@ -697,11 +694,10 @@ POSTGRES_USER=boswell
 POSTGRES_PASSWORD=boswell
 POSTGRES_DB=boswell
 
-# Neo4j
-NEO4J_HOST=neo4j
-NEO4J_PORT=7687
-NEO4J_USER=neo4j
-NEO4J_PASSWORD=neo4j
+# Memgraph (Bolt)
+MEMGRAPH_URI=bolt://memgraph:7687
+MEMGRAPH_USER=
+MEMGRAPH_PASSWORD=
 
 # Qdrant
 QDRANT_URL=http://qdrant:6333
@@ -739,7 +735,7 @@ def test_read_work(client, db_session):
 
 ### Search Tests (`backend/tests/test_search.py`)
 
-- Test Neo4j query generation.  
+- Test Memgraph query generation.  
 - Test Qdrant client integration.
 
 ### Generation Tests (`backend/tests/test_generation.py`)
@@ -756,7 +752,7 @@ def test_read_work(client, db_session):
 
 - Tray size limits enforced (NFR‑004): reject or warn when exceeding max items / character budget.  
 - Synthesis respects configurable Ollama timeout (NFR‑003).  
-- Health or degraded mode when Qdrant/Neo4j/Ollama unavailable (NFR‑005).
+- Health or degraded mode when Qdrant/Memgraph/Ollama unavailable (NFR‑005).
 
 ---
 
@@ -778,7 +774,7 @@ def test_read_work(client, db_session):
 The architecture uses:
 
 - **PostgreSQL** for relational data, Evidence tray state, and saved analyses.  
-- **Neo4j** for period scoping (soft by default) and work/author/period relationships.  
+- **Memgraph** for period scoping (soft by default) and work/author/period relationships.  
 - **Qdrant** for semantic vector search over literary chunks.  
 - **Ollama** (host only) for embeddings and synthesis grounded in the Evidence tray.  
 - **FastAPI** for the backend.  
@@ -789,7 +785,7 @@ The repository layout and CI pipeline follow best practices, ensuring reproducib
 ---
 ## 14. Reference Apps <a name="reference-apps"></a>
 - **/home/pradeep/AiProjects/tocqueville** (reskin reference: theme/palette + “analysis-style” UI flows)
-- **/home/pradeep/AiProjects/richelieu** (reskin reference: Docling + Qdrant ingest + Neo4j period scoping + CopilotKit UI)
+- **/home/pradeep/AiProjects/richelieu** (reskin reference: Docling + Qdrant ingest + Memgraph period scoping + CopilotKit UI)
 
 ### Scottish Flag Scheme (Boswell Reskin Defaults)
 - Replace the existing portrait/logo asset with a Boswell mark (e.g. `/boswell-portrait.jpg`).

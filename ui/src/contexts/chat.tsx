@@ -8,6 +8,7 @@ import {
 } from "react";
 
 import { useCorpusScope } from "@/contexts/corpus-scope";
+import { useOllamaModel } from "@/contexts/ollama-model";
 import { useTray } from "@/contexts/tray";
 import { api } from "@/lib/api";
 import type { SemanticHit, SemanticSearchResponse } from "@/types";
@@ -45,6 +46,7 @@ function newId(prefix: string): string {
 export function ChatProvider({ children }: Readonly<{ children: ReactNode }>) {
   const { trayId, tray } = useTray();
   const { periodId, softScope } = useCorpusScope();
+  const { model: ollamaChatModel } = useOllamaModel();
 
   const [messages, setMessages] = useState<ChatMessage[]>([
     {
@@ -86,7 +88,11 @@ export function ChatProvider({ children }: Readonly<{ children: ReactNode }>) {
           return;
         }
 
-        const res = await api.synthesize({ tray_id: trayId, question: q });
+        const res = await api.synthesize({
+          tray_id: trayId,
+          question: q,
+          ...(ollamaChatModel ? { model: ollamaChatModel } : {}),
+        });
         const assistantMsg: ChatMessage = {
           id: newId("a"),
           role: "assistant",
@@ -100,7 +106,7 @@ export function ChatProvider({ children }: Readonly<{ children: ReactNode }>) {
         setIsSending(false);
       }
     },
-    [trayId, tray],
+    [trayId, tray, ollamaChatModel],
   );
 
   const proposeEvidence = useCallback(

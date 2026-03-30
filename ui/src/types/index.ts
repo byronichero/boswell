@@ -108,12 +108,31 @@ export interface SynthesizeRequest {
   question: string;
   period_id?: number | null;
   soft_scope?: boolean;
+  model?: string | null;
 }
 
 export interface SynthesizeResponse {
   content: string;
   analysis_id: number | null;
   tray_id: string | null;
+}
+
+export interface ChatOpenMessage {
+  role: "user" | "assistant";
+  content: string;
+}
+
+export interface ChatOpenRequest {
+  messages: ChatOpenMessage[];
+  model?: string | null;
+}
+
+export interface OllamaModelsResponse {
+  models: string[];
+}
+
+export interface ChatOpenResponse {
+  message: string;
 }
 
 export interface HealthResponse {

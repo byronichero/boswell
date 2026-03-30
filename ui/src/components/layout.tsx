@@ -2,15 +2,17 @@ import {
   Activity,
   BarChart3,
   HelpCircle,
+  Home,
   Inbox,
   Library,
   ListTree,
   MessageSquare,
   MessagesSquare,
+  Network,
   Search,
   Sparkles,
 } from "lucide-react";
-import { NavLink, Outlet } from "react-router-dom";
+import { NavLink, Outlet, useLocation } from "react-router-dom";
 
 import { ChatBubble } from "@/components/chat-bubble";
 import { ThemeToggle } from "@/components/theme-toggle";
@@ -48,6 +50,15 @@ function NavItem({
 }
 
 export default function Layout() {
+  const { pathname } = useLocation();
+  const isHome = pathname === "/";
+  const isGraphLab = pathname === "/graph-lab";
+  let contentMaxWidthClass = "max-w-6xl";
+  if (isHome) {
+    contentMaxWidthClass = "max-w-4xl";
+  } else if (isGraphLab) {
+    contentMaxWidthClass = "max-w-7xl";
+  }
   const { periods, periodId, setPeriodId, softScope, setSoftScope, scopeInfo } = useCorpusScope();
   const { tray, isLoading: trayLoading, error: trayError, removeItem } = useTray();
 
@@ -69,14 +80,16 @@ export default function Layout() {
           </div>
         </div>
         <nav className="flex-1 space-y-1 px-3 pb-4">
-          <NavItem to="/" label="Corpus" icon={<Library className="h-4 w-4" />} />
+          <NavItem to="/" label="Home" icon={<Home className="h-4 w-4" />} />
+          <NavItem to="/corpus" label="Corpus" icon={<Library className="h-4 w-4" />} />
           <NavItem to="/concordance" label="Concordance" icon={<Search className="h-4 w-4" />} />
           <NavItem to="/keywords" label="Keywords" icon={<ListTree className="h-4 w-4" />} />
           <NavItem to="/semantic" label="Semantic" icon={<Sparkles className="h-4 w-4" />} />
           <NavItem to="/stylistics" label="Stylistics" icon={<BarChart3 className="h-4 w-4" />} />
           <NavItem to="/synthesize" label="Synthesize" icon={<MessageSquare className="h-4 w-4" />} />
-          <NavItem to="/chat" label="Chat" icon={<MessagesSquare className="h-4 w-4" />} />
+          <NavItem to="/chat" label="Evidence chat" icon={<MessagesSquare className="h-4 w-4" />} />
           <NavItem to="/knowledge-base" label="Knowledge Base" icon={<Inbox className="h-4 w-4" />} />
+          <NavItem to="/graph-lab" label="Graph Lab" icon={<Network className="h-4 w-4" />} />
           <div className="my-2 border-t border-border/60" />
           <NavItem to="/status" label="Status" icon={<Activity className="h-4 w-4" />} />
           <NavItem to="/faq" label="FAQ" icon={<HelpCircle className="h-4 w-4" />} />
@@ -92,7 +105,13 @@ export default function Layout() {
 
       {/* Main */}
       <main className="flex min-w-0 flex-1 flex-col">
-        {/* Header / scope controls */}
+        {(isHome || isGraphLab) && (
+          <div className="flex justify-end border-b bg-background/85 px-4 py-2 md:hidden">
+            <ThemeToggle />
+          </div>
+        )}
+        {/* Header / scope controls (hidden on Home / Graph Lab for full-width content) */}
+        {!isHome && !isGraphLab && (
         <div className="sticky top-0 z-20 border-b bg-background/85 backdrop-blur">
           <div className="mx-auto flex max-w-6xl flex-wrap items-center gap-3 px-4 py-3">
             <div className="flex items-center gap-2">
@@ -135,13 +154,20 @@ export default function Layout() {
             )}
           </div>
         </div>
+        )}
 
-        <div className="mx-auto flex w-full max-w-6xl flex-1 gap-4 px-4 py-6">
+        <div
+          className={cn(
+            "mx-auto flex w-full flex-1 gap-4 px-4 py-6",
+            contentMaxWidthClass,
+          )}
+        >
           <div className="min-w-0 flex-1">
             <Outlet />
           </div>
 
           {/* Evidence tray rail */}
+          {!isHome && !isGraphLab && (
           <aside className="hidden w-[360px] shrink-0 lg:block">
             <Card className="sticky top-[84px] bg-[hsl(var(--tray))]">
               <CardHeader>
@@ -196,6 +222,7 @@ export default function Layout() {
               </CardContent>
             </Card>
           </aside>
+          )}
         </div>
       </main>
 

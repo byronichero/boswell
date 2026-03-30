@@ -1,14 +1,17 @@
 import { useState } from "react";
 
+import { OllamaModelSelect } from "@/components/ollama-model-select";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Textarea } from "@/components/ui/textarea";
+import { useOllamaModel } from "@/contexts/ollama-model";
 import { useTray } from "@/contexts/tray";
 import { api } from "@/lib/api";
 import type { SynthesizeResponse } from "@/types";
 
 export default function SynthesizePage() {
   const { trayId, tray, isLoading: trayLoading } = useTray();
+  const { model } = useOllamaModel();
 
   const [question, setQuestion] = useState<string>("");
   const [result, setResult] = useState<SynthesizeResponse | null>(null);
@@ -21,7 +24,11 @@ export default function SynthesizePage() {
     setError(null);
     setResult(null);
     try {
-      const res = await api.synthesize({ tray_id: trayId, question: question.trim() });
+      const res = await api.synthesize({
+        tray_id: trayId,
+        question: question.trim(),
+        ...(model ? { model } : {}),
+      });
       setResult(res);
     } catch (e) {
       setError(e instanceof Error ? e.message : String(e));
@@ -34,11 +41,16 @@ export default function SynthesizePage() {
 
   return (
     <Card>
-      <CardHeader>
-        <CardTitle>Synthesize</CardTitle>
-        <CardDescription>
-          Grounded analysis from the Evidence tray. The model must cite excerpts as [T1], [T2], etc.
-        </CardDescription>
+      <CardHeader className="space-y-3">
+        <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+          <div>
+            <CardTitle>Synthesize</CardTitle>
+            <CardDescription>
+              Grounded analysis from the Evidence tray. The model must cite excerpts as [T1], [T2], etc.
+            </CardDescription>
+          </div>
+          <OllamaModelSelect id="synthesize-ollama-model" disabled={isLoading} />
+        </div>
       </CardHeader>
       <CardContent className="space-y-4">
         {isEmpty && (

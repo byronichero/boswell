@@ -4,7 +4,7 @@ import httpx
 from fastapi import APIRouter
 
 from app.config import get_settings
-from app.services.neo4j_sync import get_driver
+from app.services.memgraph_sync import get_driver
 from app.services.qdrant_chunks import ensure_collection
 
 router = APIRouter()
@@ -31,9 +31,9 @@ async def ready() -> dict[str, object]:
     try:
         driver = get_driver()
         driver.verify_connectivity()
-        deps["neo4j"] = "ok"
+        deps["memgraph"] = "ok"
     except Exception as e:
-        deps["neo4j"] = f"error: {e!s}"
+        deps["memgraph"] = f"error: {e!s}"
     try:
         async with httpx.AsyncClient(timeout=3.0) as client:
             r = await client.get(f"{settings.ollama_host.rstrip('/')}/api/tags")

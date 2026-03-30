@@ -15,7 +15,7 @@ from app.config import Settings, get_settings
 from app.db import SessionLocal
 from app.models import Period, Work
 from app.services.chunking import chunk_text
-from app.services.neo4j_sync import sync_from_postgres
+from app.services.memgraph_sync import sync_from_postgres
 from app.services.ollama_client import embed_texts
 from app.services.qdrant_chunks import ensure_collection, upsert_chunks
 
@@ -277,11 +277,11 @@ async def run_startup_bootstrap(*, settings: Settings | None = None) -> None:
             except Exception:
                 logger.exception("Manifest Tier B bootstrap failed")
 
-            if cfg.auto_seed_sync_neo4j:
+            if cfg.auto_seed_sync_memgraph:
                 try:
                     sync_from_postgres(db, settings=cfg)
                 except Exception:
-                    logger.exception("Neo4j sync failed during startup bootstrap")
+                    logger.exception("Memgraph sync failed during startup bootstrap")
         except Exception:
             logger.exception("Startup bootstrap failed; continuing app startup")
     finally:

@@ -142,7 +142,7 @@ export default function KnowledgeBasePage() {
         <CardHeader>
           <CardTitle>Knowledge Base</CardTitle>
           <CardDescription>
-            Upload documents to MinIO. Ingesting a document creates a Work and indexes chunks into Qdrant (Neo4j is best-effort).
+            Upload documents to MinIO. Ingesting a document creates a Work and indexes chunks into Qdrant (Memgraph is best-effort).
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-3">

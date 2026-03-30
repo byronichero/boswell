@@ -15,8 +15,8 @@ from app.models.document import Document
 from app.models.document_job import DocumentJob
 from app.models.work import Work
 from app.services.chunking import chunk_text
+from app.services.memgraph_sync import sync_from_postgres
 from app.services.minio_store import get_object_stream, put_bytes_at_key
-from app.services.neo4j_sync import sync_from_postgres
 from app.services.ollama_client import embed_texts
 from app.services.qdrant_chunks import upsert_chunks
 
@@ -71,7 +71,7 @@ def run_ingest_job(job_id: uuid.UUID, *, settings: Settings | None = None) -> No
     - Reads the document from MinIO
     - Creates a Work row in Postgres
     - Embeds + upserts chunks into Qdrant
-    - Best-effort Neo4j sync
+    - Best-effort Memgraph sync
     """
     settings = settings or get_settings()
     db = SessionLocal()
@@ -128,7 +128,7 @@ def run_ingest_job(job_id: uuid.UUID, *, settings: Settings | None = None) -> No
         try:
             sync_from_postgres(db, settings=settings)
         except Exception:
-            logger.info("Neo4j sync failed (non-fatal)", exc_info=True)
+            logger.info("Memgraph sync failed (non-fatal)", exc_info=True)
 
         job.status = "completed"
         job.chunks = len(chunks)

@@ -21,6 +21,7 @@ async def synthesize(
             db,
             tray_id=body.tray_id,
             question=body.question,
+            chat_model=body.model,
         )
     except ValueError as e:
         raise HTTPException(status_code=400, detail=str(e)) from e

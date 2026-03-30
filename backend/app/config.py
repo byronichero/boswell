@@ -12,9 +12,9 @@ class Settings(BaseSettings):
 
     database_url: str = "postgresql+psycopg2://boswell:boswell@db:5432/boswell"
 
-    neo4j_uri: str = "neo4j://neo4j:7687"
-    neo4j_user: str = "neo4j"
-    neo4j_password: str = "password"
+    memgraph_uri: str = "bolt://memgraph:7687"
+    memgraph_user: str = ""
+    memgraph_password: str = ""
 
     qdrant_url: str = "http://qdrant:6333"
     qdrant_collection: str = "boswell_chunks"
@@ -41,7 +41,7 @@ class Settings(BaseSettings):
     cors_origins: str = "http://localhost:5173,http://127.0.0.1:5173"
     auto_seed_on_startup: bool = True
     auto_seed_index_sample: bool = True
-    auto_seed_sync_neo4j: bool = True
+    auto_seed_sync_memgraph: bool = True
     auto_seed_manifest_tier_b: bool = True
     auto_seed_manifest_download_timeout_s: int = 60
 

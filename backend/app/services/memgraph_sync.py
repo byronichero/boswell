@@ -1,4 +1,9 @@
-"""Neo4j graph: Period–Work relationships for scoped retrieval."""
+"""Memgraph graph: Period–Work relationships for scoped retrieval.
+
+Uses the official ``neo4j`` Bolt driver (compatible with Memgraph's Bolt endpoint).
+"""
+
+from __future__ import annotations
 
 import logging
 
@@ -15,20 +20,25 @@ logger = logging.getLogger(__name__)
 _driver: Driver | None = None
 
 
+def _driver_auth(settings: Settings) -> tuple[str, str] | None:
+    """Return Bolt auth tuple, or None when Memgraph runs without credentials."""
+    if not settings.memgraph_user and not settings.memgraph_password:
+        return None
+    return (settings.memgraph_user, settings.memgraph_password)
+
+
 def get_driver(settings: Settings | None = None) -> Driver:
-    """Singleton Neo4j driver."""
+    """Singleton Bolt driver (Memgraph)."""
     global _driver
     settings = settings or get_settings()
     if _driver is None:
-        _driver = GraphDatabase.driver(
-            settings.neo4j_uri,
-            auth=(settings.neo4j_user, settings.neo4j_password),
-        )
+        auth = _driver_auth(settings)
+        _driver = GraphDatabase.driver(settings.memgraph_uri, auth=auth)
     return _driver
 
 
 def close_driver() -> None:
-    """Close Neo4j driver (tests / shutdown)."""
+    """Close Bolt driver (tests / shutdown)."""
     global _driver
     if _driver is not None:
         _driver.close()
@@ -79,7 +89,7 @@ def sync_from_postgres(db: Session, settings: Settings | None = None) -> None:
             for w in works:
                 session.execute_write(lambda tx, ww=w: merge_tx(tx, ww))
     except Exception:
-        logger.exception("Neo4j sync failed")
+        logger.exception("Memgraph sync failed")
         raise
 
 

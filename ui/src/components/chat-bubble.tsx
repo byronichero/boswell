@@ -16,10 +16,10 @@ export function ChatBubble({ className }: Readonly<{ className?: string }>) {
   const [draft, setDraft] = useState<string>("");
 
   useEffect(() => {
-    if (pathname === "/chat") setOpen(false);
+    if (pathname === "/chat" || pathname === "/" || pathname === "/graph-lab") setOpen(false);
   }, [pathname]);
 
-  if (pathname === "/chat") return null;
+  if (pathname === "/chat" || pathname === "/" || pathname === "/graph-lab") return null;
 
   const last = messages
     .slice()
@@ -34,7 +34,7 @@ export function ChatBubble({ className }: Readonly<{ className?: string }>) {
             <CardTitle className="text-base">Boswell chat</CardTitle>
             <div className="flex items-center gap-2">
               <Button variant="ghost" size="sm" onClick={() => navigate("/chat")}>
-                Open
+                Evidence chat
               </Button>
               <Button variant="ghost" size="sm" onClick={() => setOpen(false)}>
                 Close

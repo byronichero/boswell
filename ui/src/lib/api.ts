@@ -1,5 +1,8 @@
 import type {
+  ChatOpenRequest,
+  ChatOpenResponse,
   ConcordanceResponse,
+  OllamaModelsResponse,
   HealthResponse,
   KnowledgeBaseDocument,
   KnowledgeBaseJob,
@@ -95,6 +98,13 @@ export const api = {
   // Synthesis
   synthesize: (body: SynthesizeRequest) =>
     fetchAPI<SynthesizeResponse>("/api/analysis/synthesize", { method: "POST", body: JSON.stringify(body) }),
+
+  // Ollama
+  getOllamaModels: () => fetchAPI<OllamaModelsResponse>("/api/ollama/models"),
+
+  // Open (ungrounded) chat
+  postChatOpen: (body: ChatOpenRequest) =>
+    fetchAPI<ChatOpenResponse>("/api/chat/open", { method: "POST", body: JSON.stringify(body) }),
 
   // Knowledge Base (documents)
   listDocuments: () => fetchAPI<KnowledgeBaseDocument[]>("/api/documents"),

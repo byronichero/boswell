@@ -22,6 +22,7 @@ async def synthesize_from_tray(
     *,
     tray_id: uuid.UUID,
     question: str,
+    chat_model: str | None = None,
     settings: Settings | None = None,
 ) -> tuple[str, int | None]:
     """
@@ -75,7 +76,7 @@ async def synthesize_from_tray(
     )
     user = f"Question:\n{question}\n\nEvidence excerpts:\n\n{block}"
     try:
-        content = await chat_completion(system, user, settings=settings)
+        content = await chat_completion(system, user, model=chat_model, settings=settings)
     except Exception:
         logger.exception("Ollama synthesis failed for tray %s", tray_id)
         raise

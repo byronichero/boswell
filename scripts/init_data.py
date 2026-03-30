@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Seed literary periods, ingest bundled sample text, index Qdrant, sync Neo4j.
+"""Seed literary periods, ingest bundled sample text, index Qdrant, sync Memgraph.
 
 Run inside the backend container:
 
@@ -24,7 +24,7 @@ from app.config import get_settings  # noqa: E402
 from app.db import Base, SessionLocal, engine  # noqa: E402
 from app.models import Period, Work  # noqa: E402
 from app.services.chunking import chunk_text  # noqa: E402
-from app.services.neo4j_sync import sync_from_postgres  # noqa: E402
+from app.services.memgraph_sync import sync_from_postgres  # noqa: E402
 from app.services.ollama_client import embed_texts  # noqa: E402
 from app.services.qdrant_chunks import ensure_collection, upsert_chunks  # noqa: E402
 from sqlalchemy import select  # noqa: E402
@@ -82,7 +82,7 @@ async def _ingest_work(db, work: Work) -> None:
 async def async_main() -> None:
     parser = argparse.ArgumentParser(description="Boswell data initialization")
     parser.add_argument("--force", action="store_true", help="Drop DB tables + Qdrant collection")
-    parser.add_argument("--skip-neo4j", action="store_true", help="Skip Neo4j sync")
+    parser.add_argument("--skip-memgraph", action="store_true", help="Skip Memgraph sync")
     parser.add_argument("--skip-qdrant", action="store_true", help="Skip embeddings / Qdrant")
     args = parser.parse_args()
 
@@ -127,12 +127,12 @@ async def async_main() -> None:
         if not args.skip_qdrant:
             await _ingest_work(db, work)
 
-        if not args.skip_neo4j:
+        if not args.skip_memgraph:
             try:
                 sync_from_postgres(db)
-                logger.info("Neo4j graph synced")
+                logger.info("Memgraph graph synced")
             except Exception:
-                logger.exception("Neo4j sync failed (graph may be empty)")
+                logger.exception("Memgraph sync failed (graph may be empty)")
     finally:
         db.close()
 
