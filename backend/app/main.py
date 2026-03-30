@@ -17,6 +17,7 @@ from app.routers import (
     ollama_tools,
     periods,
     search,
+    tts,
     works,
 )
 from app.services.bootstrap import run_startup_bootstrap
@@ -56,6 +57,7 @@ app.include_router(search.router, prefix="/api/search", tags=["search"])
 app.include_router(analysis.router, prefix="/api/analysis", tags=["analysis"])
 app.include_router(chat_open.router, prefix="/api/chat", tags=["chat"])
 app.include_router(ollama_tools.router, prefix="/api/ollama", tags=["ollama"])
+app.include_router(tts.router, prefix="/api", tags=["tts"])
 
 
 @app.get("/")

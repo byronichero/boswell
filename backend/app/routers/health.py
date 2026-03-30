@@ -41,4 +41,11 @@ async def ready() -> dict[str, object]:
             deps["ollama"] = "ok"
     except Exception as e:
         deps["ollama"] = f"error: {e!s}"
+    try:
+        async with httpx.AsyncClient(timeout=3.0) as client:
+            r = await client.get(f"{settings.kokoro_tts_url.rstrip('/')}/health")
+            r.raise_for_status()
+            deps["kokoro_tts"] = "ok"
+    except Exception as e:
+        deps["kokoro_tts"] = f"error: {e!s}"
     return {"status": "ready", "dependencies": deps}

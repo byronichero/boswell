@@ -45,6 +45,10 @@ class Settings(BaseSettings):
     auto_seed_manifest_tier_b: bool = True
     auto_seed_manifest_download_timeout_s: int = 60
 
+    # Kokoro TTS (separate Docker service; see kokoro-tts/)
+    kokoro_tts_url: str = "http://kokoro-tts:8001"
+    kokoro_tts_timeout_s: float = 300.0
+
 
 @lru_cache
 def get_settings() -> Settings:

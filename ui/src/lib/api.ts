@@ -17,6 +17,7 @@ import type {
   StylisticsRollingResponse,
   SynthesizeRequest,
   SynthesizeResponse,
+  TtsRequest,
   TrayItemCreate,
   TrayItemRead,
   TrayRead,
@@ -126,6 +127,27 @@ export const api = {
   // Synthesis
   synthesize: (body: SynthesizeRequest) =>
     fetchAPI<SynthesizeResponse>("/api/analysis/synthesize", { method: "POST", body: JSON.stringify(body) }),
+
+  /** Returns WAV audio from Kokoro (via backend proxy). */
+  postTts: async (body: TtsRequest): Promise<Blob> => {
+    const response = await fetch("/api/tts", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(body),
+    });
+    if (!response.ok) {
+      let message = response.statusText;
+      try {
+        const errBody = (await response.json()) as { detail?: unknown };
+        if (typeof errBody?.detail === "string") message = errBody.detail;
+        else if (errBody?.detail != null) message = JSON.stringify(errBody.detail);
+      } catch {
+        // ignore
+      }
+      throw new Error(message);
+    }
+    return response.blob();
+  },
 
   // Ollama
   getOllamaModels: () => fetchAPI<OllamaModelsResponse>("/api/ollama/models"),

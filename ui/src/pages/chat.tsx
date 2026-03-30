@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 
 import { CopyTextButton } from "@/components/copy-text-button";
+import { ReadAloudButton } from "@/components/read-aloud-button";
 import { OllamaModelSelect } from "@/components/ollama-model-select";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -32,6 +33,7 @@ export default function ChatPage() {
 
   const [draft, setDraft] = useState<string>("");
   const [evidenceQuery, setEvidenceQuery] = useState<string>("");
+  const [ttsError, setTtsError] = useState<string | null>(null);
   const scrollRef = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => {
@@ -62,7 +64,14 @@ export default function ChatPage() {
         </CardHeader>
         <CardContent className="space-y-3">
           <div className="flex flex-wrap items-center gap-2">
-            <Button variant="outline" size="sm" onClick={reset}>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => {
+                setTtsError(null);
+                reset();
+              }}
+            >
               Reset chat
             </Button>
             <div className="text-xs text-muted-foreground">
@@ -73,6 +82,11 @@ export default function ChatPage() {
           {error && (
             <div className="rounded-md border border-destructive/30 bg-destructive/10 p-3 text-sm text-destructive">
               {error}
+            </div>
+          )}
+          {ttsError && (
+            <div className="rounded-md border border-destructive/30 bg-destructive/10 p-2 text-xs text-destructive">
+              Read aloud: {ttsError}
             </div>
           )}
 
@@ -86,6 +100,11 @@ export default function ChatPage() {
                   <div className="mb-1 flex items-center justify-between gap-2">
                     <div className="text-xs font-medium text-muted-foreground">{formatRole(m.role)}</div>
                     <div className="flex shrink-0 items-center gap-0.5">
+                      <ReadAloudButton
+                        variant="icon"
+                        text={m.content}
+                        onError={(msg) => setTtsError(msg)}
+                      />
                       <CopyTextButton text={m.content} aria-label="Copy message" />
                       <span className="text-[10px] text-muted-foreground tabular-nums">
                         {new Date(m.createdAtMs).toLocaleTimeString()}
@@ -166,6 +185,11 @@ export default function ChatPage() {
                       </div>
                     </div>
                     <div className="flex shrink-0 items-center gap-1">
+                      <ReadAloudButton
+                        variant="icon"
+                        text={h.text}
+                        onError={(msg) => setTtsError(msg)}
+                      />
                       <CopyTextButton text={h.text} aria-label="Copy excerpt" />
                       <Button
                         variant="outline"

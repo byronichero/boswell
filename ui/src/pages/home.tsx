@@ -13,6 +13,7 @@ import {
 import { Link } from "react-router-dom";
 
 import { CopyTextButton } from "@/components/copy-text-button";
+import { ReadAloudButton } from "@/components/read-aloud-button";
 import { OllamaModelSelect } from "@/components/ollama-model-select";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -47,6 +48,7 @@ export default function HomePage() {
   const [draft, setDraft] = useState<string>("");
   const [isSending, setIsSending] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
+  const [ttsError, setTtsError] = useState<string | null>(null);
   const bottomRef = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => {
@@ -57,6 +59,7 @@ export default function HomePage() {
     const text = draft.trim();
     if (!text || isSending) return;
     setError(null);
+    setTtsError(null);
     setDraft("");
     const previous = messages;
     const next: ChatOpenMessage[] = [...messages, { role: "user", content: text }];
@@ -115,11 +118,19 @@ export default function HomePage() {
                     <div className="text-[10px] font-medium uppercase tracking-wide opacity-80">
                       {m.role === "user" ? "You" : "Boswell"}
                     </div>
-                    <CopyTextButton
-                      text={m.content}
-                      variant={m.role === "user" ? "onPrimary" : "default"}
-                      aria-label={m.role === "user" ? "Copy your message" : "Copy Boswell reply"}
-                    />
+                    <div className="flex shrink-0 items-center gap-0.5">
+                      <ReadAloudButton
+                        variant="icon"
+                        iconTone={m.role === "user" ? "onPrimary" : "default"}
+                        text={m.content}
+                        onError={(msg) => setTtsError(msg)}
+                      />
+                      <CopyTextButton
+                        text={m.content}
+                        variant={m.role === "user" ? "onPrimary" : "default"}
+                        aria-label={m.role === "user" ? "Copy your message" : "Copy Boswell reply"}
+                      />
+                    </div>
                   </div>
                   <div className="whitespace-pre-wrap">{m.content}</div>
                 </div>
@@ -135,6 +146,11 @@ export default function HomePage() {
             {error && (
               <div className="rounded-md border border-destructive/30 bg-destructive/10 p-3 text-sm text-destructive">
                 {error}
+              </div>
+            )}
+            {ttsError && (
+              <div className="rounded-md border border-destructive/30 bg-destructive/10 p-2 text-xs text-destructive">
+                Read aloud: {ttsError}
               </div>
             )}
 

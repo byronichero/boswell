@@ -1,6 +1,7 @@
 import { useState } from "react";
 
 import { CopyTextButton } from "@/components/copy-text-button";
+import { ReadAloudButton } from "@/components/read-aloud-button";
 import { OllamaModelSelect } from "@/components/ollama-model-select";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -18,11 +19,13 @@ export default function SynthesizePage() {
   const [result, setResult] = useState<SynthesizeResponse | null>(null);
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
+  const [ttsError, setTtsError] = useState<string | null>(null);
 
   async function run(): Promise<void> {
     if (!trayId) return;
     setIsLoading(true);
     setError(null);
+    setTtsError(null);
     setResult(null);
     try {
       const res = await api.synthesize({
@@ -78,12 +81,24 @@ export default function SynthesizePage() {
 
         {result && (
           <div className="rounded-md border bg-background p-4">
-            <div className="mb-2 flex items-start justify-between gap-2">
-              <div className="text-xs text-muted-foreground">
+            <div className="mb-2 flex flex-wrap items-start justify-end gap-2">
+              <div className="mr-auto text-xs text-muted-foreground">
                 analysis_id={result.analysis_id ?? "—"} · tray_id={result.tray_id ?? "—"}
               </div>
-              <CopyTextButton text={result.content} aria-label="Copy synthesis" />
+              <div className="flex shrink-0 items-center gap-0.5">
+                <ReadAloudButton
+                  variant="icon"
+                  text={result.content}
+                  onError={(m) => setTtsError(m)}
+                />
+                <CopyTextButton text={result.content} aria-label="Copy synthesis" />
+              </div>
             </div>
+            {ttsError && (
+              <div className="mb-2 rounded-md border border-destructive/30 bg-destructive/10 p-2 text-xs text-destructive">
+                Read aloud: {ttsError}
+              </div>
+            )}
             <div className="whitespace-pre-wrap text-sm leading-relaxed">{result.content}</div>
           </div>
         )}

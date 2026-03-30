@@ -26,6 +26,8 @@ services:
       MAX_TRAY_EXCERPT_CHARS: "120000"
       SOFT_SCOPE_NEIGHBOR_PERIODS: "1"
       CORS_ORIGINS: http://localhost:5173,http://127.0.0.1:5173
+      KOKORO_TTS_URL: http://kokoro-tts:8001
+      KOKORO_TTS_TIMEOUT_S: "300"
     ports:
       - "8000:8000"
     depends_on:
@@ -35,11 +37,24 @@ services:
         condition: service_started
       qdrant:
         condition: service_started
+      kokoro-tts:
+        condition: service_started
     extra_hosts:
       - "host.docker.internal:host-gateway"
     volumes:
       - ./scripts:/app/scripts:ro
       - ./docs:/app/docs:ro
+
+  # Kokoro-82M TTS (hexgrad/kokoro). First run may download model weights.
+  kokoro-tts:
+    build:
+      context: .
+      dockerfile: kokoro-tts/Dockerfile
+    restart: unless-stopped
+    ports:
+      - "8001:8001"
+    volumes:
+      - kokoro_hf_cache:/root/.cache/huggingface
 
   ui:
     image: node:20-alpine
@@ -113,3 +128,4 @@ volumes:
   qdrant_data:
   memgraph_data:
   ui_node_modules:
+  kokoro_hf_cache:

@@ -1,5 +1,7 @@
 import { useState } from "react";
 
+import { CopyTextButton } from "@/components/copy-text-button";
+import { ReadAloudButton } from "@/components/read-aloud-button";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -17,10 +19,12 @@ export default function SemanticPage() {
   const [result, setResult] = useState<SemanticSearchResponse | null>(null);
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
+  const [ttsError, setTtsError] = useState<string | null>(null);
 
   async function run(): Promise<void> {
     setIsLoading(true);
     setError(null);
+    setTtsError(null);
     setResult(null);
     try {
       const res = await api.postSemantic({
@@ -68,6 +72,11 @@ export default function SemanticPage() {
             {error}
           </div>
         )}
+        {ttsError && (
+          <div className="rounded-md border border-destructive/30 bg-destructive/10 p-2 text-xs text-destructive">
+            Read aloud: {ttsError}
+          </div>
+        )}
 
         {result && (
           <div className="space-y-3">
@@ -83,20 +92,28 @@ export default function SemanticPage() {
                       {h.locator} · score {h.score.toFixed(3)}
                     </div>
                   </div>
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={async () =>
-                      addItem({
-                        work_id: h.work_id,
-                        locator: h.locator,
-                        excerpt: h.text,
-                        note: `Semantic hit (score ${h.score.toFixed(3)}): "${query.trim()}"`,
-                      })
-                    }
-                  >
-                    Add to tray
-                  </Button>
+                  <div className="flex shrink-0 items-center gap-0.5">
+                    <ReadAloudButton
+                      variant="icon"
+                      text={h.text}
+                      onError={(msg) => setTtsError(msg)}
+                    />
+                    <CopyTextButton text={h.text} aria-label="Copy excerpt" />
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={async () =>
+                        addItem({
+                          work_id: h.work_id,
+                          locator: h.locator,
+                          excerpt: h.text,
+                          note: `Semantic hit (score ${h.score.toFixed(3)}): "${query.trim()}"`,
+                        })
+                      }
+                    >
+                      Add to tray
+                    </Button>
+                  </div>
                 </div>
                 <div className="mt-2 whitespace-pre-wrap text-sm">{h.text}</div>
               </div>

@@ -199,6 +199,14 @@ export interface ChatOpenResponse {
   message: string;
 }
 
+/** POST /api/tts — Kokoro TTS (proxied to kokoro-tts container). */
+export interface TtsRequest {
+  text: string;
+  voice?: string;
+  lang_code?: string;
+  speed?: number;
+}
+
 export interface HealthResponse {
   status: string;
   service: string;
