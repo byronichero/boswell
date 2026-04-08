@@ -1,6 +1,8 @@
 # Boswell stack: Postgres, Memgraph, Qdrant, FastAPI backend, Vite UI.
 # Ollama and MinIO run on the host only (see .env.example).
 # Usage: docker compose up --build
+#
+# Bind mounts use :z so SELinux (e.g. Fedora) relabels host paths for container access.
 
 services:
   backend:
@@ -42,8 +44,8 @@ services:
     extra_hosts:
       - "host.docker.internal:host-gateway"
     volumes:
-      - ./scripts:/app/scripts:ro
-      - ./docs:/app/docs:ro
+      - ./scripts:/app/scripts:ro,z
+      - ./docs:/app/docs:ro,z
 
   # Kokoro-82M TTS (hexgrad/kokoro). First run may download model weights.
   kokoro-tts:
@@ -61,7 +63,7 @@ services:
     working_dir: /app
     restart: unless-stopped
     volumes:
-      - ./ui:/app
+      - ./ui:/app:z
       - ui_node_modules:/app/node_modules
     command: sh -c "npm install && npm run dev -- --host 0.0.0.0 --port 5173"
     ports:
