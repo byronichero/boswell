@@ -122,7 +122,6 @@ export function SplashScreen({ onEnter }: SplashScreenProps) {
             quoteVisible ? "opacity-100" : "opacity-0",
           )}
         >
-          <p className="mb-3 text-xs uppercase tracking-[0.25em] text-muted-foreground">Boswell</p>
           <blockquote className="max-w-3xl text-center font-serif text-3xl font-medium leading-snug text-foreground md:text-5xl">
             I am lost without my Boswell.
           </blockquote>
