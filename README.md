@@ -1,8 +1,30 @@
 # Boswell
 
-English-literature analysis stack: **FastAPI** + **Postgres** + **Memgraph** (period scoping) + **Qdrant** (semantic chunks) + **Ollama** on the host (embeddings + synthesis). See [`boswell-prd.md`](boswell-prd.md) for the full product spec.
+**English-literature analysis** with an **evidence-first** workflow: explore a curated corpus, retrieve passages with **concordance** and **semantic** search, curate an **Evidence tray**, and synthesize answers **grounded in the excerpts you choose**—with **local LLMs** and vector search under your control.
 
-**Documentation:** [User guide](docs/users-guide.md) · [Admin guide](docs/admin-guide.md) · [Developer guide](docs/developer-guide.md)
+**For students, teachers, and close readers**
+
+Pick a **literary period** (with optional soft scope across neighboring eras), run **Concordance** and **Semantic** search over indexed works, add strong lines to the **Evidence tray**, then use **Evidence chat** and **Synthesize** to draft analysis tied to real quotations—not free-form hallucination. A **Knowledge Base** path ingests your documents when S3-compatible object storage is configured; **Graph Lab** embeds Memgraph Lab to visualize period–work relationships.
+
+**Local-first.** Boswell runs on **your** stack: **Ollama** on the host for embeddings and chat, **Postgres** for works and metadata, **Memgraph** for relationship scoping, **Qdrant** for semantic chunks—so prompts and corpus data stay in your environment when you deploy that way.
+
+The app is named after [James Boswell](https://en.wikipedia.org/wiki/James_Boswell) (1740–1795), Samuel Johnson’s friend and biographer—famously invoked when Johnson said, *“I am lost without my Boswell.”*
+
+*Optional:* For a Marlowe-style centered portrait under the title, add **`ui/public/boswell.jpg`** and mirror the `<p align="center"><img … width="120" … /></p>` pattern from [Marlowe’s README](https://github.com/byronichero/marlowe). The UI sidebar already uses that path.
+
+**Documentation:** [User guide](docs/users-guide.md) · [Admin guide](docs/admin-guide.md) · [Developer guide](docs/developer-guide.md) · [Product spec](boswell-prd.md)
+
+## Stack
+
+- **Backend:** Python 3.11+, FastAPI
+- **Database:** PostgreSQL
+- **Graph:** Memgraph (period–work scoping; Bolt / Cypher)
+- **Vector store:** Qdrant
+- **AI:** Ollama on the host (`host.docker.internal` from containers)
+- **Document processing:** Docling-supported formats where enabled (Knowledge Base)
+- **Object storage (optional):** MinIO or S3-compatible on the host
+- **Frontend:** React, Vite, TypeScript, Tailwind CSS, Shadcn-style UI
+- **Deployment:** Docker Compose
 
 ## Prerequisites
 
