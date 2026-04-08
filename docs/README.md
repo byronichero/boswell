@@ -1,6 +1,14 @@
 # Boswell — Starter corpus (`docs/`)
 
-This folder holds **reference and starter documents** for local development and demos: ship a small, documented set of files with the repo; scale up via scripts or downloads rather than bloating git.
+## Guides
+
+| Guide | Audience |
+|-------|----------|
+| [User guide](users-guide.md) | End users: corpus, Evidence tray, tools, scope |
+| [Admin guide](admin-guide.md) | Deployment, Docker, env, SELinux, health, backups |
+| [Developer guide](developer-guide.md) | Code layout, APIs, scripts, tests |
+
+This folder also holds **reference and starter documents** for local development and demos: ship a small, documented set of files with the repo; scale up via scripts or downloads rather than bloating git.
 
 ## Corpus tiers
 

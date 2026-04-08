@@ -2,6 +2,8 @@
 
 English-literature analysis stack: **FastAPI** + **Postgres** + **Memgraph** (period scoping) + **Qdrant** (semantic chunks) + **Ollama** on the host (embeddings + synthesis). See [`boswell-prd.md`](boswell-prd.md) for the full product spec.
 
+**Documentation:** [User guide](docs/users-guide.md) · [Admin guide](docs/admin-guide.md) · [Developer guide](docs/developer-guide.md)
+
 ## Prerequisites
 
 - Docker with Compose v2
