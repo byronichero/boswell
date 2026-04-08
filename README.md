@@ -49,6 +49,21 @@ Host-only services **Ollama** and optional **MinIO** are not defined in Compose;
 - Python lint: `ruff check backend/app scripts` (from repo root with `pip install -r backend/requirements.txt`)
 - Tests: `pytest` from repo root (see `pyproject.toml`)
 
+## <img src="ui/public/fedora_logo.svg.png" width="32" alt="Fedora" style="vertical-align: middle;" /> Built on Fedora
+
+Boswell was developed on a custom-built AI workstation:
+
+| Component | Specification |
+|-----------|---------------|
+| **OS** | Fedora Linux 42 (KDE Plasma, Wayland) |
+| **CPU** | AMD Ryzen 9 9950X (32 threads) |
+| **RAM** | 128 GiB |
+| **GPU** | NVIDIA GeForce RTX 4060 |
+
+The NVIDIA GPU is used exclusively for AI workloads via the [Fedora CUDA container](https://github.com/NVIDIA/nvidia-container-toolkit)—Ollama and other LLM inference run in the container for isolation and reproducibility. The host runs on AMD integrated graphics.
+
+*Local LLMs, vector databases, and the full stack run on this machine.*
+
 ## License
 
 See individual documents and third-party texts (e.g. Project Gutenberg) for licensing.
